@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QGridLayout, QPushButton, QLabel,
-                             QLineEdit, QGroupBox, QFormLayout, QSpinBox)
+                             QLineEdit, QGroupBox, QFormLayout, QSpinBox, QButtonGroup)
 from PyQt5.QtCore import QTimer, Qt, pyqtSignal, QObject
 from PyQt5.QtGui import QFont
 import matplotlib.pyplot as plt
@@ -21,6 +21,29 @@ with open("booster_knobs.json", "r") as f:
     knobs = json.load(f)
 
 
+class RangeSelectorGraph(pg.LinearRegionItem):
+    def __init__(self):
+        super(RangeSelectorGraph, self).__init__(values=[0, 0.5],
+                                                 orientation='vertical',
+                                                 brush=pg.mkBrush(0, 255, 0, 50),
+                                                 pen=pg.mkPen('g', width=2),
+                                                 hoverBrush=pg.mkBrush(0, 255, 0, 100),
+                                                 movable=True,
+                                                 bounds=[0, 0.5])
+        self.min_val, self.max_val = self.getRegion()
+        self.sigRegionChanged.connect(self.regionChanged)
+        self.sigRegionChangeFinished.connect(self.regionChangeFinished)
+
+    def regionChanged(self):
+        self.getRangeCoordinates()
+
+    def regionChangeFinished(self):
+        self.getRangeCoordinates()
+
+    def getRangeCoordinates(self):
+        self.min_val, self.max_val = self.getRegion()
+
+
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
@@ -33,7 +56,7 @@ class MplCanvas(FigureCanvas):
 class DataManager(QObject):
     data_updated = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, bpm_to_observe):
         super().__init__()
         self.data = {"x": [np.nan], "cx": np.nan, "qx": np.nan, "qx_m": np.nan, "qx_p": np.nan, "freq_spectrum_qx": [np.nan], "amplitude_spectrum_qx": [np.nan],
                      "y": [np.nan], "cy": np.nan, "qy": np.nan, "qy_m": np.nan, "qy_p": np.nan, "freq_spectrum_qy": [np.nan], "amplitude_spectrum_qy": [np.nan],
@@ -47,7 +70,7 @@ class DataManager(QObject):
         self.cx_array = deque(maxlen=self.max_length)
         self.cy_array = deque(maxlen=self.max_length)
 
-        self.bpm_to_observe = None
+        self.bpm_to_observe = bpm_to_observe
         self.initialize_data(self.bpm_to_observe)
 
     def initialize_data(self, bpm_to_observe):
@@ -94,8 +117,6 @@ class DataManager(QObject):
         return idx_q0_minus_satellite, ampl_q0_minus_satellite, idx_q0_plus_satellite, ampl_q0_plus_satellite
 
     def analyze_data(self, x, y):
-        print(datetime.now())
-        print(x[0], y[0])
         qx, qx_amplitude, freq_spectrum_qx, amplitude_spectrum_qx,  = get_spectrum(x, self.nturns, self.freq_range_qx)
         qy, qy_amplitude, freq_spectrum_qy, amplitude_spectrum_qy = get_spectrum(y, self.nturns, self.freq_range_qy)
         qs, _, _, _ = get_spectrum(x, self.nturns, self.freq_range_qs)
@@ -118,7 +139,6 @@ class DataManager(QObject):
         self.data["qy_p"] = qy + qs
         self.data["freq_spectrum_qy"] = freq_spectrum_qy
         self.data["amplitude_spectrum_qy"] = amplitude_spectrum_qy
-        print(datetime.now())
 
 
 class MainWindow(QMainWindow):
@@ -127,7 +147,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Chromaticity measurement")
         self.setGeometry(100, 100, 1400, 900)
 
-        self.data_manager = DataManager()
+        self.data_manager = DataManager(knobs["constants"]["bpm_to_observe"])
 
         self.data_manager.data_updated.connect(self.update_plots)
         self.data_manager.data_updated.connect(self.update_fields)
@@ -148,6 +168,8 @@ class MainWindow(QMainWindow):
             plots_layout.addWidget(canvas, row, col)
 
         buttons_layout = QHBoxLayout()
+        self.button_group = QButtonGroup()
+        self.button_group.setExclusive(True)
         button_style = """
             QPushButton {
                 background-color: #4CAF50;
@@ -164,24 +186,35 @@ class MainWindow(QMainWindow):
             QPushButton:pressed {
                 background-color: #3d8b40;
             }
+            QPushButton:checked {
+                background-color: #ff5722;
+                border: 2px solid #ff9800;
+            }
         """
-
         bpms = list(knobs["bpm"].keys())
         bpm_to_observe = knobs["constants"]["bpm_to_observe"]
         self.buttons = []
         for bpm in bpms:
             btn = QPushButton(bpm)
             btn.setStyleSheet(button_style)
+            btn.setCheckable(True)
+            if bpm == bpm_to_observe:
+                btn.setChecked(True)
+            else:
+                btn.setChecked(False)
             btn.clicked.connect(self.choose_bpm)
             self.buttons.append(btn)
+            self.button_group.addButton(btn)
             buttons_layout.addWidget(btn)
         buttons_layout.addStretch()
 
-        self.data_manager.bpm_to_observe = bpm_to_observe
-
+        right_panel_layout = QHBoxLayout()
         fields_group = QGroupBox("Parameters")
         fields_group.setFont(QFont("Arial", 10, QFont.Bold))
+        fields_group.setMaximumWidth(300)
         fields_layout = QFormLayout()
+        fields_layout.setSpacing(5)
+        fields_layout.setContentsMargins(10, 10, 10, 10)
 
         self.field1 = QLineEdit()
         self.field2 = QLineEdit()
@@ -205,41 +238,188 @@ class MainWindow(QMainWindow):
 
         fields_group.setLayout(fields_layout)
 
+        control_buttons_group = QGroupBox("Knobs")
+        control_buttons_group.setFont(QFont("Arial", 10, QFont.Bold))
+        control_buttons_group.setMaximumWidth(200)
+        control_buttons_layout = QVBoxLayout()
+        control_buttons_layout.setSpacing(10)
+
+        self.reset_btn = QPushButton("Reset")
+        self.reset_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                border: none;
+                color: white;
+                padding: 8px;
+                font-size: 12px;
+                font-weight: bold;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #0b7dda;
+            }
+        """)
+        self.reset_btn.clicked.connect(self.on_reset_button_clicked)
+        control_buttons_layout.addWidget(self.reset_btn)
+
+        spinbox_buttons_layout = QVBoxLayout()
+
+        spinbox_group1 = QWidget()
+        spinbox_group1_layout = QHBoxLayout()
+        spinbox_group1_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.spinbox1_label = QLabel("Cx")
+        self.spinbox1_label.setFont(QFont("Arial", 10))
+
+        self.spinbox1_minus = QPushButton("-")
+        self.spinbox1_minus.setFixedSize(30, 25)
+        self.spinbox1_minus.clicked.connect(lambda: self.change_spinbox_value(1, -0.1))
+
+        self.spinbox1_value = QLineEdit("0.0")
+        self.spinbox1_value.setFixedWidth(60)
+        self.spinbox1_value.setAlignment(Qt.AlignCenter)
+
+        self.spinbox1_plus = QPushButton("+")
+        self.spinbox1_plus.setFixedSize(30, 25)
+        self.spinbox1_plus.clicked.connect(lambda: self.change_spinbox_value(1, 0.1))
+
+        spinbox_group1_layout.addWidget(self.spinbox1_label)
+        spinbox_group1_layout.addWidget(self.spinbox1_minus)
+        spinbox_group1_layout.addWidget(self.spinbox1_value)
+        spinbox_group1_layout.addWidget(self.spinbox1_plus)
+        spinbox_group1.setLayout(spinbox_group1_layout)
+
+        spinbox_group2 = QWidget()
+        spinbox_group2_layout = QHBoxLayout()
+        spinbox_group2_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.spinbox2_label = QLabel("Cy:")
+        self.spinbox2_label.setFont(QFont("Arial", 10))
+
+        self.spinbox2_minus = QPushButton("-")
+        self.spinbox2_minus.setFixedSize(30, 25)
+        self.spinbox2_minus.clicked.connect(lambda: self.change_spinbox_value(2, -0.1))
+
+        self.spinbox2_value = QLineEdit("0.0")
+        self.spinbox2_value.setFixedWidth(60)
+        self.spinbox2_value.setAlignment(Qt.AlignCenter)
+
+        self.spinbox2_plus = QPushButton("+")
+        self.spinbox2_plus.setFixedSize(30, 25)
+        self.spinbox2_plus.clicked.connect(lambda: self.change_spinbox_value(2, 0.1))
+
+        spinbox_group2_layout.addWidget(self.spinbox2_label)
+        spinbox_group2_layout.addWidget(self.spinbox2_minus)
+        spinbox_group2_layout.addWidget(self.spinbox2_value)
+        spinbox_group2_layout.addWidget(self.spinbox2_plus)
+        spinbox_group2.setLayout(spinbox_group2_layout)
+
+        spinbox_buttons_layout.addWidget(spinbox_group1)
+        spinbox_buttons_layout.addWidget(spinbox_group2)
+
+        control_buttons_layout.addLayout(spinbox_buttons_layout)
+        control_buttons_group.setLayout(control_buttons_layout)
+
+        text_fields_group = QGroupBox("Sextupoles")
+        text_fields_group.setFont(QFont("Arial", 10, QFont.Bold))
+        text_fields_group.setMaximumWidth(250)
+        text_fields_layout = QVBoxLayout()
+        text_fields_layout.setSpacing(8)
+
+        text_field_style = """
+            QLineEdit {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                padding: 6px;
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+                color: #495057;
+            }
+            QLineEdit:focus {
+                border-color: #80bdff;
+                outline: 0;
+            }
+            QLineEdit:read-only {
+                background-color: #e9ecef;
+                color: #6c757d;
+            }
+        """
+
+        self.text_field1 = QLineEdit()
+        self.text_field1.setPlaceholderText("Status message 1")
+        self.text_field1.setReadOnly(True)
+        self.text_field1.setStyleSheet(text_field_style)
+
+        self.text_field2 = QLineEdit()
+        self.text_field2.setPlaceholderText("Status message 2")
+        self.text_field2.setReadOnly(True)
+        self.text_field2.setStyleSheet(text_field_style)
+
+        self.text_field3 = QLineEdit()
+        self.text_field3.setPlaceholderText("Status message 3")
+        self.text_field3.setReadOnly(True)
+        self.text_field3.setStyleSheet(text_field_style)
+
+        text_fields_layout.addWidget(self.text_field1)
+        text_fields_layout.addWidget(self.text_field2)
+        text_fields_layout.addWidget(self.text_field3)
+        text_fields_group.setLayout(text_fields_layout)
+
+        right_panel_layout.addWidget(fields_group)
+        right_panel_layout.addWidget(control_buttons_group)
+        right_panel_layout.addWidget(text_fields_group)
+        right_panel_layout.addStretch()
+
         main_layout.addLayout(plots_layout)
         main_layout.addLayout(buttons_layout)
-        main_layout.addWidget(fields_group)
+        main_layout.addLayout(right_panel_layout)
 
-        spinbox_layout = QHBoxLayout()
-        qx_range_label = QLabel("Qx Range:")
-        qx_range_label.setFont(QFont("Arial", 9))
-        spinbox_layout.addWidget(qx_range_label)
-        self.qx_min_spin = QSpinBox()
-        self.qx_min_spin.setRange(0, 1000)
-        self.qx_min_spin.setValue(300)
-        self.qx_min_spin.setSuffix("e-3")
-        self.qx_min_spin.setWrapping(False)
-        self.qx_min_spin.setButtonSymbols(QSpinBox.UpDownArrows)
-        self.qx_min_spin.setFocusPolicy(Qt.StrongFocus)
-        self.qx_min_spin.wheelEvent = lambda event: None
-        spinbox_layout.addWidget(self.qx_min_spin)
-        qx_to_label = QLabel("to")
-        spinbox_layout.addWidget(qx_to_label)
+    def on_reset_button_clicked(self):
+        pass
 
-        self.qx_max_spin = QSpinBox()
-        self.qx_max_spin.setRange(0, 1000)
-        self.qx_max_spin.setValue(410)
-        self.qx_max_spin.setSuffix("e-3")
-        self.qx_max_spin.setWrapping(False)
-        self.qx_max_spin.setButtonSymbols(QSpinBox.UpDownArrows)
-        self.qx_max_spin.setFocusPolicy(Qt.StrongFocus)
-        self.qx_max_spin.wheelEvent = lambda event: None  # Блокируем колесико мыши
-        spinbox_layout.addWidget(self.qx_max_spin)
-
-        spectrum_control_layout.addLayout(spinbox_layout)
+    def change_spinbox_value(self, spinbox_id, delta):
+        if spinbox_id == 1:
+            try:
+                current_value = float(self.spinbox1_value.text())
+                new_value = current_value + delta
+                self.spinbox1_value.setText(f"{new_value:.2f}")
+                self.text_field2.setText(f"Spinbox 1 value: {new_value:.2f}")
+            except ValueError:
+                self.spinbox1_value.setText("0.00")
+        elif spinbox_id == 2:
+            try:
+                current_value = float(self.spinbox2_value.text())
+                new_value = current_value + delta
+                self.spinbox2_value.setText(f"{new_value:.2f}")
+                self.text_field3.setText(f"Spinbox 2 value: {new_value:.2f}")
+            except ValueError:
+                self.spinbox2_value.setText("0.00")
 
     def update_fields(self):
         self.data_manager.data["sigma_E_spread"] = abs(float(self.field1.text()))
         self.data_manager.data["Energy"] = abs(float(self.field2.text()))
+
+        # ИЗМЕНЕНИЕ: Обновляем статусные поля
+        self.text_field1.setText(f"σ/E: {self.field1.text()}, E: {self.field2.text()}")
+
+        # Обновляем значения qs и qx/qy, если они введены вручную
+        if self.field3.text():
+            try:
+                manual_qs = float(self.field3.text())
+                # Здесь можно добавить логику использования manual_qs
+                self.text_field2.setText(f"Manual Qs: {manual_qs:.4f}")
+            except ValueError:
+                pass
+
+        if self.field4.text() and self.field5.text():
+            try:
+                manual_qx = float(self.field4.text())
+                manual_qy = float(self.field5.text())
+                # Здесь можно добавить логику использования manual_qx и manual_qy
+                self.text_field3.setText(f"Manual Qx: {manual_qx:.4f}, Qy: {manual_qy:.4f}")
+            except ValueError:
+                pass
 
     def update_plots(self):
         self.canvases[0].ax.clear()
@@ -319,7 +499,9 @@ class MainWindow(QMainWindow):
         self.data_manager.data["y"] = np.nan
 
     def choose_bpm(self):
-        pass
+        button = self.sender()
+        bpm = button.text()
+        self.data_manager.bpm_to_observe = bpm
 
     def function2(self):
         pass
