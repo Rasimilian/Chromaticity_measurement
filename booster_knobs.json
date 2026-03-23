@@ -1,0 +1,541 @@
+{
+  "constants": {
+    "orbit_units": "mm",
+    "current_units": "A",
+    "energy": 0.2,
+    "alpha": 0.0088456,
+    "bpm_to_observe": "BA1.PK2"
+  },
+  "bpm": {
+    "BIS.PK2": {
+      "orbit_h": "BI-BIS:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BIS:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BIS:PK2-fastAvI:Mea",
+      "turns_h": "BI-BIS:PK2-tbtX:Mea",
+      "turns_v": "BI-BIS:PK2-tbtY:Mea",
+      "turns_curr": "BI-BIS:PK2-tbtI:Mea"
+    },
+    "BA1.PK1": {
+      "orbit_h": "BI-BA1:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK1-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK1-tbtX:Mea",
+      "turns_v": "BI-BA1:PK1-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK1-tbtI:Mea"
+    },
+    "BA1.PK2": {
+      "orbit_h": "BI-BA1:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK2-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK2-tbtX:Mea",
+      "turns_v": "BI-BA1:PK2-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK2-tbtI:Mea"
+    },
+    "BA1.PK3": {
+      "orbit_h": "BI-BA1:PK3-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK3-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK3-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK3-tbtX:Mea",
+      "turns_v": "BI-BA1:PK3-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK3-tbtI:Mea"
+    },
+    "BA1.PK4": {
+      "orbit_h": "BI-BA1:PK4-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK4-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK4-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK4-tbtX:Mea",
+      "turns_v": "BI-BA1:PK4-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK4-tbtI:Mea"
+    },
+    "BA1.PK5": {
+      "orbit_h": "BI-BA1:PK5-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK5-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK5-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK5-tbtX:Mea",
+      "turns_v": "BI-BA1:PK5-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK5-tbtI:Mea"
+    },
+    "BA1.PK6": {
+      "orbit_h": "BI-BA1:PK6-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK6-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK6-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK6-tbtX:Mea",
+      "turns_v": "BI-BA1:PK6-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK6-tbtI:Mea"
+    },
+    "BA1.PK7": {
+      "orbit_h": "BI-BA1:PK7-fastAvX:Mea",
+      "orbit_v": "BI-BA1:PK7-fastAvY:Mea",
+      "orbit_curr": "BI-BA1:PK7-fastAvI:Mea",
+      "turns_h": "BI-BA1:PK7-tbtX:Mea",
+      "turns_v": "BI-BA1:PK7-tbtY:Mea",
+      "turns_curr": "BI-BA1:PK7-tbtI:Mea"
+    },
+    "BDS.PK1": {
+      "orbit_h": "BI-BDS:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BDS:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BDS:PK1-fastAvI:Mea",
+      "turns_h": "BI-BDS:PK1-tbtX:Mea",
+      "turns_v": "BI-BDS:PK1-tbtY:Mea",
+      "turns_curr": "BI-BDS:PK1-tbtI:Mea"
+    },
+    "BDS.PK2": {
+      "orbit_h": "BI-BDS:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BDS:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BDS:PK2-fastAvI:Mea",
+      "turns_h": "BI-BDS:PK2-tbtX:Mea",
+      "turns_v": "BI-BDS:PK2-tbtY:Mea",
+      "turns_curr": "BI-BDS:PK2-tbtI:Mea"
+    },
+    "BA2.PK1": {
+      "orbit_h": "BI-BA2:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK1-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK1-tbtX:Mea",
+      "turns_v": "BI-BA2:PK1-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK1-tbtI:Mea"
+    },
+    "BA2.PK2": {
+      "orbit_h": "BI-BA2:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK2-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK2-tbtX:Mea",
+      "turns_v": "BI-BA2:PK2-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK2-tbtI:Mea"
+    },
+    "BA2.PK3": {
+      "orbit_h": "BI-BA2:PK3-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK3-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK3-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK3-tbtX:Mea",
+      "turns_v": "BI-BA2:PK3-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK3-tbtI:Mea"
+    },
+    "BA2.PK4": {
+      "orbit_h": "BI-BA2:PK4-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK4-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK4-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK4-tbtX:Mea",
+      "turns_v": "BI-BA2:PK4-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK4-tbtI:Mea"
+    },
+    "BA2.PK5": {
+      "orbit_h": "BI-BA2:PK5-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK5-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK5-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK5-tbtX:Mea",
+      "turns_v": "BI-BA2:PK5-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK5-tbtI:Mea"
+    },
+    "BA2.PK6": {
+      "orbit_h": "BI-BA2:PK6-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK6-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK6-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK6-tbtX:Mea",
+      "turns_v": "BI-BA2:PK6-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK6-tbtI:Mea"
+    },
+    "BA2.PK7": {
+      "orbit_h": "BI-BA2:PK7-fastAvX:Mea",
+      "orbit_v": "BI-BA2:PK7-fastAvY:Mea",
+      "orbit_curr": "BI-BA2:PK7-fastAvI:Mea",
+      "turns_h": "BI-BA2:PK7-tbtX:Mea",
+      "turns_v": "BI-BA2:PK7-tbtY:Mea",
+      "turns_curr": "BI-BA2:PK7-tbtI:Mea"
+    },
+    "BES.PK1": {
+      "orbit_h": "BI-BES:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BES:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BES:PK1-fastAvI:Mea",
+      "turns_h": "BI-BES:PK1-tbtX:Mea",
+      "turns_v": "BI-BES:PK1-tbtY:Mea",
+      "turns_curr": "BI-BES:PK1-tbtI:Mea"
+    },
+    "BES.PK2": {
+      "orbit_h": "BI-BES:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BES:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BES:PK2-fastAvI:Mea",
+      "turns_h": "BI-BES:PK2-tbtX:Mea",
+      "turns_v": "BI-BES:PK2-tbtY:Mea",
+      "turns_curr": "BI-BES:PK2-tbtI:Mea"
+    },
+    "BA3.PK1": {
+      "orbit_h": "BI-BA3:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK1-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK1-tbtX:Mea",
+      "turns_v": "BI-BA3:PK1-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK1-tbtI:Mea"
+    },
+    "BA3.PK2": {
+      "orbit_h": "BI-BA3:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK2-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK2-tbtX:Mea",
+      "turns_v": "BI-BA3:PK2-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK2-tbtI:Mea"
+    },
+    "BA3.PK3": {
+      "orbit_h": "BI-BA3:PK3-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK3-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK3-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK3-tbtX:Mea",
+      "turns_v": "BI-BA3:PK3-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK3-tbtI:Mea"
+    },
+    "BA3.PK4": {
+      "orbit_h": "BI-BA3:PK4-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK4-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK4-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK4-tbtX:Mea",
+      "turns_v": "BI-BA3:PK4-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK4-tbtI:Mea"
+    },
+    "BA3.PK5": {
+      "orbit_h": "BI-BA3:PK5-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK5-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK5-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK5-tbtX:Mea",
+      "turns_v": "BI-BA3:PK5-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK5-tbtI:Mea"
+    },
+    "BA3.PK6": {
+      "orbit_h": "BI-BA3:PK6-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK6-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK6-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK6-tbtX:Mea",
+      "turns_v": "BI-BA3:PK6-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK6-tbtI:Mea"
+    },
+    "BA3.PK7": {
+      "orbit_h": "BI-BA3:PK7-fastAvX:Mea",
+      "orbit_v": "BI-BA3:PK7-fastAvY:Mea",
+      "orbit_curr": "BI-BA3:PK7-fastAvI:Mea",
+      "turns_h": "BI-BA3:PK7-tbtX:Mea",
+      "turns_v": "BI-BA3:PK7-tbtY:Mea",
+      "turns_curr": "BI-BA3:PK7-tbtI:Mea"
+    },
+    "BCS.PK1": {
+      "orbit_h": "BI-BCS:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BCS:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BCS:PK1-fastAvI:Mea",
+      "turns_h": "BI-BCS:PK1-tbtX:Mea",
+      "turns_v": "BI-BCS:PK1-tbtY:Mea",
+      "turns_curr": "BI-BCS:PK1-tbtI:Mea"
+    },
+    "BCS.PK3": {
+      "orbit_h": "BI-BCS:PK3-fastAvX:Mea",
+      "orbit_v": "BI-BCS:PK3-fastAvY:Mea",
+      "orbit_curr": "BI-BCS:PK3-fastAvI:Mea",
+      "turns_h": "BI-BCS:PK3-tbtX:Mea",
+      "turns_v": "BI-BCS:PK3-tbtY:Mea",
+      "turns_curr": "BI-BCS:PK3-tbtI:Mea"
+    },
+    "BA4.PK1": {
+      "orbit_h": "BI-BA4:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK1-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK1-tbtX:Mea",
+      "turns_v": "BI-BA4:PK1-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK1-tbtI:Mea"
+    },
+    "BA4.PK2": {
+      "orbit_h": "BI-BA4:PK2-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK2-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK2-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK2-tbtX:Mea",
+      "turns_v": "BI-BA4:PK2-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK2-tbtI:Mea"
+    },
+    "BA4.PK3": {
+      "orbit_h": "BI-BA4:PK3-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK3-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK3-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK3-tbtX:Mea",
+      "turns_v": "BI-BA4:PK3-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK3-tbtI:Mea"
+    },
+    "BA4.PK4": {
+      "orbit_h": "BI-BA4:PK4-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK4-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK4-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK4-tbtX:Mea",
+      "turns_v": "BI-BA4:PK4-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK4-tbtI:Mea"
+    },
+    "BA4.PK5": {
+      "orbit_h": "BI-BA4:PK5-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK5-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK5-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK5-tbtX:Mea",
+      "turns_v": "BI-BA4:PK5-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK5-tbtI:Mea"
+    },
+    "BA4.PK6": {
+      "orbit_h": "BI-BA4:PK6-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK6-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK6-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK6-tbtX:Mea",
+      "turns_v": "BI-BA4:PK6-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK6-tbtI:Mea"
+    },
+    "BA4.PK7": {
+      "orbit_h": "BI-BA4:PK7-fastAvX:Mea",
+      "orbit_v": "BI-BA4:PK7-fastAvY:Mea",
+      "orbit_curr": "BI-BA4:PK7-fastAvI:Mea",
+      "turns_h": "BI-BA4:PK7-tbtX:Mea",
+      "turns_v": "BI-BA4:PK7-tbtY:Mea",
+      "turns_curr": "BI-BA4:PK7-tbtI:Mea"
+    },
+    "BIS.PK1": {
+      "orbit_h": "BI-BIS:PK1-fastAvX:Mea",
+      "orbit_v": "BI-BIS:PK1-fastAvY:Mea",
+      "orbit_curr": "BI-BIS:PK1-fastAvI:Mea",
+      "turns_h": "BI-BIS:PK1-tbtX:Mea",
+      "turns_v": "BI-BIS:PK1-tbtY:Mea",
+      "turns_curr": "BI-BIS:PK1-tbtI:Mea"
+    }
+  },
+  "sextupole": {
+    "ba1.sf1": {
+      "set_curr": "MG-BA1:SF1-Iadd:Set",
+      "meas_curr": "MG-BA1:SF1-Ipoi:Mea",
+      "put_curr": "MG-BA1:SF1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA1:SF1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba1.sf1"
+      ],
+      "step": 0.01
+    },
+    "ba1.sd1": {
+      "set_curr": "MG-BA1:SD1-Iadd:Set",
+      "meas_curr": "MG-BA1:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA1:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA1:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba1.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba1.sd2": {
+      "set_curr": "MG-BA1:SD2-Iadd:Set",
+      "meas_curr": "MG-BA1:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA1:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA1:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba1.sd2"
+      ],
+      "step": 0.01
+    },
+    "ba1.sf2": {
+      "set_curr": "MG-BA1:SF2-Iadd:Set",
+      "meas_curr": "MG-BA1:SF2-Ipoi:Mea",
+      "put_curr": "MG-BA1:SF2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA1:SF2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba1.sf2"
+      ],
+      "step": 0.01
+    },
+    "ba2.sf1": {
+      "set_curr": "MG-BA2:SF1-Iadd:Set",
+      "meas_curr": "MG-BA2:SF1-Ipoi:Mea",
+      "put_curr": "MG-BA2:SF1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA2:SF1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba2.sf1"
+      ],
+      "step": 0.01
+    },
+    "ba2.sd1": {
+      "set_curr": "MG-BA2:SD1-Iadd:Set",
+      "meas_curr": "MG-BA2:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA2:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA2:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba2.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba2.sd2": {
+      "set_curr": "MG-BA2:SD2-Iadd:Set",
+      "meas_curr": "MG-BA2:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA2:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA2:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba2.sd2"
+      ],
+      "step": 0.01
+    },
+    "ba2.sf2": {
+      "set_curr": "MG-BA2:SF2-Iadd:Set",
+      "meas_curr": "MG-BA2:SF2-Ipoi:Mea",
+      "put_curr": "MG-BA2:SF2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA2:SF2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba2.sf2"
+      ],
+      "step": 0.01
+    },
+    "ba3.sf1": {
+      "set_curr": "MG-BA3:SF1-Iadd:Set",
+      "meas_curr": "MG-BA3:SF1-Ipoi:Mea",
+      "put_curr": "MG-BA3:SF1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA3:SF1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba3.sf1"
+      ],
+      "step": 0.01
+    },
+    "ba3.sd1": {
+      "set_curr": "MG-BA3:SD1-Iadd:Set",
+      "meas_curr": "MG-BA3:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA3:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA3:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba3.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba3.sd2": {
+      "set_curr": "MG-BA3:SD2-Iadd:Set",
+      "meas_curr": "MG-BA3:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA3:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA3:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba3.sd2"
+      ],
+      "step": 0.01
+    },
+    "ba3.sf2": {
+      "set_curr": "MG-BA3:SF2-Iadd:Set",
+      "meas_curr": "MG-BA3:SF2-Ipoi:Mea",
+      "put_curr": "MG-BA3:SF2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA3:SF2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba3.sf2"
+      ],
+      "step": 0.01
+    },
+    "ba4.sf1": {
+      "set_curr": "MG-BA4:SF1-Iadd:Set",
+      "meas_curr": "MG-BA4:SF1-Ipoi:Mea",
+      "put_curr": "MG-BA4:SF1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA4:SF1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba4.sf1"
+      ],
+      "step": 0.01
+    },
+    "ba4.sd1": {
+      "set_curr": "MG-BA4:SD1-Iadd:Set",
+      "meas_curr": "MG-BA4:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA4:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA4:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba4.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba4.sd2": {
+      "set_curr": "MG-BA4:SD2-Iadd:Set",
+      "meas_curr": "MG-BA4:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA4:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA4:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba4.sd2"
+      ],
+      "step": 0.01
+    },
+    "ba4.sf2": {
+      "set_curr": "MG-BA4:SF2-Iadd:Set",
+      "meas_curr": "MG-BA4:SF2-Ipoi:Mea",
+      "put_curr": "MG-BA4:SF2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA4:SF2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba4.sf2"
+      ],
+      "step": 0.01
+    }
+  }
+}
