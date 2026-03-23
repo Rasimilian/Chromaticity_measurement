@@ -31,19 +31,84 @@ class MplCanvas(FigureCanvas):
         self.setParent(parent)
         self.fig.tight_layout(pad=3.0)
 
+        # Включаем интерактивный режим
         self.setFocusPolicy(Qt.StrongFocus)
 
+        # Сохраняем текущий масштаб и исходный
         self.saved_xlim = None
         self.saved_ylim = None
+        self.original_xlim = None
+        self.original_ylim = None
+        self.initial_zoom_saved = False
 
+        # Переменные для панорамирования
+        self.pan_start_x = None
+        self.pan_start_y = None
+        self.pan_start_xlim = None
+        self.pan_start_ylim = None
+        self.panning = False
+
+        # Подключаем обработчики событий
         self.mpl_connect('scroll_event', self.on_scroll)
+        self.mpl_connect('button_press_event', self.on_press)
+        self.mpl_connect('motion_notify_event', self.on_motion)
+        self.mpl_connect('button_release_event', self.on_release)
+
+        # Добавляем QPushButton поверх графика
+        self.add_reset_button()
+
+    def add_reset_button(self):
+        """Добавляет QPushButton поверх графика в левом нижнем углу"""
+        from PyQt5.QtWidgets import QPushButton
+
+        # Создаем кнопку
+        self.reset_button = QPushButton('Reset', self)
+
+        # Применяем стиль
+        reset_button_style = """
+            QPushButton {
+                background-color: #6c757d;
+                border: none;
+                color: white;
+                padding: 5px 10px;
+                font-size: 10px;
+                font-weight: bold;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #5a6268;
+            }
+            QPushButton:pressed {
+                background-color: #545b62;
+            }
+        """
+        self.reset_button.setStyleSheet(reset_button_style)
+
+        # Устанавливаем размер кнопки
+        self.reset_button.setFixedSize(60, 28)
+
+        # Подключаем сигнал
+        self.reset_button.clicked.connect(self.on_reset_click)
+
+        # Позиционируем кнопку (будет обновляться при resize)
+        self.reset_button.move(10, self.height() - 40)
+
+    def on_reset_click(self):
+        """Обработчик нажатия кнопки сброса"""
+        self.reset_zoom()
+
+    def resizeEvent(self, event):
+        """Обновляет позицию кнопки при изменении размера графика"""
+        super().resizeEvent(event)
+        if hasattr(self, 'reset_button'):
+            # Позиционируем кнопку в левом нижнем углу с отступами
+            self.reset_button.move(10, self.height() - 40)
 
     def on_scroll(self, event):
         """Обработчик прокрутки колесика мыши для масштабирования"""
         if event.inaxes != self.ax:
             return
 
-        # Получаем текущие пределы осей
         xlim = self.ax.get_xlim()
         ylim = self.ax.get_ylim()
         xdata = event.xdata
@@ -52,31 +117,66 @@ class MplCanvas(FigureCanvas):
         if xdata is None or ydata is None:
             return
 
-        # Определяем направление прокрутки
         if event.button == 'up':
-            scale_factor = 0.9  # Приближаем
+            scale_factor = 0.9
         else:
-            scale_factor = 1.1  # Отдаляем
+            scale_factor = 1.1
 
-        # Масштабируем X
         new_width = (xlim[1] - xlim[0]) * scale_factor
         new_xlim = (xdata - new_width * (xdata - xlim[0]) / (xlim[1] - xlim[0]),
                     xdata + new_width * (xlim[1] - xdata) / (xlim[1] - xlim[0]))
 
-        # Масштабируем Y
         new_height = (ylim[1] - ylim[0]) * scale_factor
         new_ylim = (ydata - new_height * (ydata - ylim[0]) / (ylim[1] - ylim[0]),
                     ydata + new_height * (ylim[1] - ydata) / (ylim[1] - ylim[0]))
 
-        # Применяем новые пределы и сохраняем их
         self.ax.set_xlim(new_xlim)
         self.ax.set_ylim(new_ylim)
 
-        # Сохраняем текущий масштаб
         self.saved_xlim = new_xlim
         self.saved_ylim = new_ylim
 
         self.draw_idle()
+
+    def on_press(self, event):
+        """Обработчик нажатия кнопки мыши для панорамирования"""
+        # Панорамирование только при зажатой правой кнопке мыши (button=3)
+        if event.inaxes != self.ax or event.button != 3:
+            return
+
+        self.panning = True
+        self.pan_start_x = event.xdata
+        self.pan_start_y = event.ydata
+        self.pan_start_xlim = self.ax.get_xlim()
+        self.pan_start_ylim = self.ax.get_ylim()
+
+        # Меняем курсор
+        self.setCursor(Qt.ClosedHandCursor)
+
+    def on_motion(self, event):
+        """Обработчик движения мыши для панорамирования"""
+        if not self.panning or event.inaxes != self.ax:
+            return
+
+        dx = event.xdata - self.pan_start_x
+        dy = event.ydata - self.pan_start_y
+
+        # Сдвигаем пределы
+        xlim = (self.pan_start_xlim[0] - dx, self.pan_start_xlim[1] - dx)
+        ylim = (self.pan_start_ylim[0] - dy, self.pan_start_ylim[1] - dy)
+
+        self.ax.set_xlim(xlim)
+        self.ax.set_ylim(ylim)
+
+        self.saved_xlim = xlim
+        self.saved_ylim = ylim
+
+        self.draw_idle()
+
+    def on_release(self, event):
+        """Обработчик отпускания кнопки мыши"""
+        self.panning = False
+        self.setCursor(Qt.ArrowCursor)
 
     def save_current_zoom(self):
         """Сохраняет текущий масштаб"""
@@ -88,6 +188,32 @@ class MplCanvas(FigureCanvas):
         if self.saved_xlim is not None and self.saved_ylim is not None:
             self.ax.set_xlim(self.saved_xlim)
             self.ax.set_ylim(self.saved_ylim)
+
+    def save_original_zoom(self):
+        """Сохраняет исходный масштаб (автоматический)"""
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
+
+        # Проверяем, что масштаб не является дефолтным [0,1]
+        if xlim != (0.0, 1.0) or ylim != (0.0, 1.0):
+            self.original_xlim = xlim
+            self.original_ylim = ylim
+            self.initial_zoom_saved = True
+
+    def reset_zoom(self):
+        """Сбрасывает масштаб к исходному"""
+        if self.original_xlim is not None and self.original_ylim is not None:
+            self.ax.set_xlim(self.original_xlim)
+            self.ax.set_ylim(self.original_ylim)
+            self.saved_xlim = self.original_xlim
+            self.saved_ylim = self.original_ylim
+            self.draw_idle()
+        else:
+            # Если исходный масштаб не сохранен, используем autoscale
+            self.ax.autoscale()
+            self.saved_xlim = self.ax.get_xlim()
+            self.saved_ylim = self.ax.get_ylim()
+            self.draw_idle()
 
 
 class DataManager(QObject):
@@ -652,6 +778,11 @@ class MainWindow(QMainWindow):
 
         for canvas in self.canvases:
             canvas.restore_zoom()
+
+            # Сохраняем исходный масштаб для каждого графика (если еще не сохранен)
+        for canvas in self.canvases:
+            if not canvas.initial_zoom_saved:
+                canvas.save_original_zoom()
 
         for canvas in self.canvases:
             canvas.draw()
