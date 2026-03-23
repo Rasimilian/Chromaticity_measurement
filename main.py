@@ -31,6 +31,64 @@ class MplCanvas(FigureCanvas):
         self.setParent(parent)
         self.fig.tight_layout(pad=3.0)
 
+        self.setFocusPolicy(Qt.StrongFocus)
+
+        self.saved_xlim = None
+        self.saved_ylim = None
+
+        self.mpl_connect('scroll_event', self.on_scroll)
+
+    def on_scroll(self, event):
+        """Обработчик прокрутки колесика мыши для масштабирования"""
+        if event.inaxes != self.ax:
+            return
+
+        # Получаем текущие пределы осей
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
+        xdata = event.xdata
+        ydata = event.ydata
+
+        if xdata is None or ydata is None:
+            return
+
+        # Определяем направление прокрутки
+        if event.button == 'up':
+            scale_factor = 0.9  # Приближаем
+        else:
+            scale_factor = 1.1  # Отдаляем
+
+        # Масштабируем X
+        new_width = (xlim[1] - xlim[0]) * scale_factor
+        new_xlim = (xdata - new_width * (xdata - xlim[0]) / (xlim[1] - xlim[0]),
+                    xdata + new_width * (xlim[1] - xdata) / (xlim[1] - xlim[0]))
+
+        # Масштабируем Y
+        new_height = (ylim[1] - ylim[0]) * scale_factor
+        new_ylim = (ydata - new_height * (ydata - ylim[0]) / (ylim[1] - ylim[0]),
+                    ydata + new_height * (ylim[1] - ydata) / (ylim[1] - ylim[0]))
+
+        # Применяем новые пределы и сохраняем их
+        self.ax.set_xlim(new_xlim)
+        self.ax.set_ylim(new_ylim)
+
+        # Сохраняем текущий масштаб
+        self.saved_xlim = new_xlim
+        self.saved_ylim = new_ylim
+
+        self.draw_idle()
+
+    def save_current_zoom(self):
+        """Сохраняет текущий масштаб"""
+        self.saved_xlim = self.ax.get_xlim()
+        self.saved_ylim = self.ax.get_ylim()
+
+    def restore_zoom(self):
+        """Восстанавливает сохраненный масштаб"""
+        if self.saved_xlim is not None and self.saved_ylim is not None:
+            self.ax.set_xlim(self.saved_xlim)
+            self.ax.set_ylim(self.saved_ylim)
+
 
 class DataManager(QObject):
     data_updated = pyqtSignal()
@@ -189,6 +247,27 @@ class MainWindow(QMainWindow):
             buttons_layout.addWidget(btn)
         buttons_layout.addStretch()
 
+        text_field_style = """
+            QLineEdit {
+                background-color: #ffffff;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 6px 10px;
+                font-family: 'Arial', sans-serif;
+                font-size: 14px;
+                color: #000000;
+            }
+            QLineEdit:focus {
+                border-color: #80bdff;
+                background-color: #ffffff;
+                outline: 0;
+                color: #000000;
+            }
+            QLineEdit:read-only {
+                background-color: #f5f5f5;
+                color: #000000;
+            }
+        """
         right_panel_layout = QHBoxLayout()
         fields_group = QGroupBox("Parameters")
         fields_group.setFont(QFont("Arial", 10, QFont.Bold))
@@ -202,6 +281,12 @@ class MainWindow(QMainWindow):
         self.field3 = QLineEdit()
         self.field4 = QLineEdit()
         self.field5 = QLineEdit()
+
+        self.field1.setStyleSheet(text_field_style)
+        self.field2.setStyleSheet(text_field_style)
+        self.field3.setStyleSheet(text_field_style)
+        self.field4.setStyleSheet(text_field_style)
+        self.field5.setStyleSheet(text_field_style)
 
         fields_layout.addRow("SigmaE/E:", self.field1)
         fields_layout.addRow("Energy (Gev):", self.field2)
@@ -309,21 +394,23 @@ class MainWindow(QMainWindow):
 
         text_field_style = """
             QLineEdit {
-                background-color: #f8f9fa;
+                background-color: #ffffff;
                 border: 1px solid #dee2e6;
-                border-radius: 4px;
-                padding: 6px;
-                font-family: 'Courier New', monospace;
-                font-size: 11px;
-                color: #495057;
+                border-radius: 8px;
+                padding: 6px 10px;
+                font-family: 'Arial', sans-serif;
+                font-size: 14px;
+                color: #000000;
             }
             QLineEdit:focus {
                 border-color: #80bdff;
+                background-color: #ffffff;
                 outline: 0;
+                color: #000000;
             }
             QLineEdit:read-only {
-                background-color: #e9ecef;
-                color: #6c757d;
+                background-color: #f5f5f5;
+                color: #000000;
             }
         """
 
@@ -433,7 +520,7 @@ class MainWindow(QMainWindow):
         self.data_manager.data["Energy"] = abs(float(self.field2.text()))
 
         # ИЗМЕНЕНИЕ: Обновляем статусные поля
-        self.text_field1.setText(f"σ/E: {self.field1.text()}, E: {self.field2.text()}")
+        self.text_field1.setText(f"None")
 
         # Обновляем значения qs и qx/qy, если они введены вручную
         if self.field3.text():
@@ -474,9 +561,29 @@ class MainWindow(QMainWindow):
         self.canvases[1].ax.set_xlabel('Tune Qx')
         self.canvases[1].ax.set_ylabel('Amplitude')
         self.canvases[1].ax.axvline(qx, color='black', linestyle='--', alpha=0.5)
+        self.canvases[1].ax.annotate(f'Qx = {qx:.3f}',
+                                     xy=(qx, max(y) * 0.9),
+                                     xytext=(qx + 0.05, max(y) * 0.9),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qx_m, color='black', linestyle='--', alpha=0.5)
+        self.canvases[1].ax.annotate(f'Qx-s = {qx_m:.3f}',
+                                     xy=(qx_m, max(y) * 0.7),
+                                     xytext=(qx_m - 0.15, max(y) * 0.7),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qx_p, color='black', linestyle='--', alpha=0.5)
+        self.canvases[1].ax.annotate(f'Qx+s = {qx_p:.3f}',
+                                     xy=(qx_p, max(y) * 0.5),
+                                     xytext=(qx_p + 0.05, max(y) * 0.5),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
+        self.canvases[1].ax.annotate(f'Qs = {qs:.3f}',
+                                     xy=(qs, max(y) * 0.7),
+                                     xytext=(qs + 0.05, max(y) * 0.7),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.grid(True, alpha=0.3)
 
         self.canvases[2].ax.clear()
@@ -509,9 +616,29 @@ class MainWindow(QMainWindow):
         self.canvases[4].ax.set_xlabel('Tune Qx')
         self.canvases[4].ax.set_ylabel('Amplitude')
         self.canvases[4].ax.axvline(qy, color='black', linestyle='--', alpha=0.5)
-        self.canvases[4].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
+        self.canvases[4].ax.annotate(f'Qy = {qy:.3f}',
+                                     xy=(qy, max(y) * 0.9),
+                                     xytext=(qy + 0.05, max(y) * 0.9),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.axvline(qy_m, color='black', linestyle='--', alpha=0.5)
-        self.canvases[4].ax.axvline(qy_p, color='black', linestyle='--', alpha=0.5)
+        self.canvases[4].ax.annotate(f'Qy-s = {qy_m:.3f}',
+                                     xy=(qy_m, max(y) * 0.7),
+                                     xytext=(qy_m - 0.15, max(y) * 0.7),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
+        self.canvases[4].ax.axvline(qx_p, color='black', linestyle='--', alpha=0.5)
+        self.canvases[4].ax.annotate(f'Qy+s = {qy_p:.3f}',
+                                     xy=(qy_p, max(y) * 0.5),
+                                     xytext=(qy_p + 0.05, max(y) * 0.5),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
+        self.canvases[4].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
+        self.canvases[4].ax.annotate(f'Qs = {qs:.3f}',
+                                     xy=(qs, max(y) * 0.7),
+                                     xytext=(qs + 0.05, max(y) * 0.7),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.grid(True, alpha=0.3)
 
         self.canvases[5].ax.clear()
@@ -522,6 +649,9 @@ class MainWindow(QMainWindow):
         self.canvases[5].ax.set_xlabel('Count')
         self.canvases[5].ax.set_ylabel('Chromaticity Cy')
         self.canvases[5].ax.grid(True, alpha=0.3)
+
+        for canvas in self.canvases:
+            canvas.restore_zoom()
 
         for canvas in self.canvases:
             canvas.draw()
