@@ -273,9 +273,6 @@ class DataManager(QObject):
 
         self.analyze_data(self.data["x"], self.data["y"])
 
-        self.cx_array.append(self.data["cx"])
-        self.cy_array.append(self.data["cy"])
-
         self.data_updated.emit()
 
         for pv in self.pvs_updated:
@@ -305,7 +302,7 @@ class DataManager(QObject):
         return idx_q0_minus_satellite, ampl_q0_minus_satellite, idx_q0_plus_satellite, ampl_q0_plus_satellite
 
     def analyze_data(self, x, y):
-        if len(x) > 0:
+        if len(x) >= self.data["turns"]:
             qx, qx_amplitude, freq_spectrum_qx, amplitude_spectrum_qx,  = get_spectrum(x, self.data["turns"], self.freq_range_qx)
             qy, qy_amplitude, freq_spectrum_qy, amplitude_spectrum_qy = get_spectrum(y, self.data["turns"], self.freq_range_qy)
             qs, _, _, _ = get_spectrum(x, self.data["turns"], self.freq_range_qs)
@@ -328,6 +325,9 @@ class DataManager(QObject):
             self.data["qy_p"] = qy + qs
             self.data["freq_spectrum_qy"] = freq_spectrum_qy
             self.data["amplitude_spectrum_qy"] = amplitude_spectrum_qy
+
+            self.cx_array.append(self.data["cx"])
+            self.cy_array.append(self.data["cy"])
 
 
 class MainWindow(QMainWindow):
@@ -510,7 +510,7 @@ class MainWindow(QMainWindow):
         self.spinbox1_value = QLineEdit("0.0")
         self.spinbox1_value.setFixedWidth(60)
         self.spinbox1_value.setAlignment(Qt.AlignCenter)
-        self.spinbox1_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(1))
+        self.spinbox1_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(1, float(self.spinbox1_value.text())))
 
         self.spinbox1_plus = QPushButton("+")
         self.spinbox1_plus.setFixedSize(30, 25)
@@ -536,7 +536,7 @@ class MainWindow(QMainWindow):
         self.spinbox2_value = QLineEdit("0.0")
         self.spinbox2_value.setFixedWidth(60)
         self.spinbox2_value.setAlignment(Qt.AlignCenter)
-        self.spinbox2_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(2))
+        self.spinbox2_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(2, float(self.spinbox2_value.text())))
 
         self.spinbox2_plus = QPushButton("+")
         self.spinbox2_plus.setFixedSize(30, 25)
@@ -692,14 +692,15 @@ class MainWindow(QMainWindow):
             new_value = current_value + delta
             self.spinbox2_value.setText(f"{new_value:.2f}")
 
-    def change_spinbox_textfield_value(self, spinbox_id):
+    def change_spinbox_textfield_value(self, spinbox_id, previous_value):
         if spinbox_id == 1:
             current_value = float(self.spinbox1_value.text())
-            print(current_value)
-            self.calculte_and_set_sextupole_dI([current_value, 0])
+            delta = current_value - previous_value
+            self.calculte_and_set_sextupole_dI([delta, 0])
         elif spinbox_id == 2:
             current_value = float(self.spinbox2_value.text())
-            self.calculte_and_set_sextupole_dI([0, current_value])
+            delta = current_value - previous_value
+            self.calculte_and_set_sextupole_dI([0, delta])
 
     def calculte_and_set_sextupole_dI(self, delta_cxy):
         coeff = self.data_manager.data["energy"] / 0.2
