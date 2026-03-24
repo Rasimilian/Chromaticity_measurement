@@ -461,12 +461,12 @@ class MainWindow(QMainWindow):
         self.field5.setReadOnly(False)
         self.field6.setReadOnly(False)
 
-        self.field1.editingFinished.connect(self.update_fields)
-        self.field2.editingFinished.connect(self.update_fields)
-        self.field3.editingFinished.connect(self.update_fields)
-        self.field4.editingFinished.connect(self.update_fields)
-        self.field5.editingFinished.connect(self.update_fields)
-        self.field6.editingFinished.connect(self.update_fields)
+        self.field1.returnPressed.connect(self.update_fields)
+        self.field2.returnPressed.connect(self.update_fields)
+        self.field3.returnPressed.connect(self.update_fields)
+        self.field4.returnPressed.connect(self.update_fields)
+        self.field5.returnPressed.connect(self.update_fields)
+        self.field6.returnPressed.connect(self.update_fields)
 
         fields_group.setLayout(fields_layout)
 
@@ -510,6 +510,7 @@ class MainWindow(QMainWindow):
         self.spinbox1_value = QLineEdit("0.0")
         self.spinbox1_value.setFixedWidth(60)
         self.spinbox1_value.setAlignment(Qt.AlignCenter)
+        self.spinbox1_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(1))
 
         self.spinbox1_plus = QPushButton("+")
         self.spinbox1_plus.setFixedSize(30, 25)
@@ -535,6 +536,7 @@ class MainWindow(QMainWindow):
         self.spinbox2_value = QLineEdit("0.0")
         self.spinbox2_value.setFixedWidth(60)
         self.spinbox2_value.setAlignment(Qt.AlignCenter)
+        self.spinbox2_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(2))
 
         self.spinbox2_plus = QPushButton("+")
         self.spinbox2_plus.setFixedSize(30, 25)
@@ -690,11 +692,21 @@ class MainWindow(QMainWindow):
             new_value = current_value + delta
             self.spinbox2_value.setText(f"{new_value:.2f}")
 
+    def change_spinbox_textfield_value(self, spinbox_id):
+        if spinbox_id == 1:
+            current_value = float(self.spinbox1_value.text())
+            print(current_value)
+            self.calculte_and_set_sextupole_dI([current_value, 0])
+        elif spinbox_id == 2:
+            current_value = float(self.spinbox2_value.text())
+            self.calculte_and_set_sextupole_dI([0, current_value])
+
     def calculte_and_set_sextupole_dI(self, delta_cxy):
         coeff = self.data_manager.data["energy"] / 0.2
         dI_sext = self.data_manager.cxy_inv.dot(delta_cxy) * coeff
         pvs = list(self.data_manager.sextupole_set_values.keys())
         vals = np.array(list(self.data_manager.sextupole_set_values.values()))
+        print(vals)
         epics.caput_many(pvs, vals + dI_sext)
 
     def update_fields(self):
