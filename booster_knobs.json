@@ -314,36 +314,6 @@
       ],
       "step": 0.01
     },
-    "ba1.sd1": {
-      "set_curr": "MG-BA1:SD1-Iadd:Set",
-      "meas_curr": "MG-BA1:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA1:SD1-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA1:SD1-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba1.sd1"
-      ],
-      "step": 0.01
-    },
-    "ba1.sd2": {
-      "set_curr": "MG-BA1:SD2-Iadd:Set",
-      "meas_curr": "MG-BA1:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA1:SD2-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA1:SD2-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba1.sd2"
-      ],
-      "step": 0.01
-    },
     "ba1.sf2": {
       "set_curr": "MG-BA1:SF2-Iadd:Set",
       "meas_curr": "MG-BA1:SF2-Ipoi:Mea",
@@ -371,36 +341,6 @@
       "min_val": -6,
       "model_name": [
         "ba2.sf1"
-      ],
-      "step": 0.01
-    },
-    "ba2.sd1": {
-      "set_curr": "MG-BA2:SD1-Iadd:Set",
-      "meas_curr": "MG-BA2:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA2:SD1-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA2:SD1-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba2.sd1"
-      ],
-      "step": 0.01
-    },
-    "ba2.sd2": {
-      "set_curr": "MG-BA2:SD2-Iadd:Set",
-      "meas_curr": "MG-BA2:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA2:SD2-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA2:SD2-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba2.sd2"
       ],
       "step": 0.01
     },
@@ -434,36 +374,6 @@
       ],
       "step": 0.01
     },
-    "ba3.sd1": {
-      "set_curr": "MG-BA3:SD1-Iadd:Set",
-      "meas_curr": "MG-BA3:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA3:SD1-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA3:SD1-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba3.sd1"
-      ],
-      "step": 0.01
-    },
-    "ba3.sd2": {
-      "set_curr": "MG-BA3:SD2-Iadd:Set",
-      "meas_curr": "MG-BA3:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA3:SD2-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA3:SD2-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba3.sd2"
-      ],
-      "step": 0.01
-    },
     "ba3.sf2": {
       "set_curr": "MG-BA3:SF2-Iadd:Set",
       "meas_curr": "MG-BA3:SF2-Ipoi:Mea",
@@ -494,6 +404,111 @@
       ],
       "step": 0.01
     },
+    "ba4.sf2": {
+      "set_curr": "MG-BA4:SF2-Iadd:Set",
+      "meas_curr": "MG-BA4:SF2-Ipoi:Mea",
+      "put_curr": "MG-BA4:SF2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA4:SF2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba4.sf2"
+      ],
+      "step": 0.01
+    },
+    "ba1.sd1": {
+      "set_curr": "MG-BA1:SD1-Iadd:Set",
+      "meas_curr": "MG-BA1:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA1:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA1:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba1.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba1.sd2": {
+      "set_curr": "MG-BA1:SD2-Iadd:Set",
+      "meas_curr": "MG-BA1:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA1:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA1:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba1.sd2"
+      ],
+      "step": 0.01
+    },
+    "ba2.sd1": {
+      "set_curr": "MG-BA2:SD1-Iadd:Set",
+      "meas_curr": "MG-BA2:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA2:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA2:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba2.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba2.sd2": {
+      "set_curr": "MG-BA2:SD2-Iadd:Set",
+      "meas_curr": "MG-BA2:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA2:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA2:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba2.sd2"
+      ],
+      "step": 0.01
+    },
+    "ba3.sd1": {
+      "set_curr": "MG-BA3:SD1-Iadd:Set",
+      "meas_curr": "MG-BA3:SD1-Ipoi:Mea",
+      "put_curr": "MG-BA3:SD1-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA3:SD1-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba3.sd1"
+      ],
+      "step": 0.01
+    },
+    "ba3.sd2": {
+      "set_curr": "MG-BA3:SD2-Iadd:Set",
+      "meas_curr": "MG-BA3:SD2-Ipoi:Mea",
+      "put_curr": "MG-BA3:SD2-Iadd:Set",
+      "coeffs": [
+        9.495984
+      ],
+      "activate": "MG-BA3:SD2-PSON:Cmd",
+      "max_val": 6,
+      "min_val": -6,
+      "model_name": [
+        "ba3.sd2"
+      ],
+      "step": 0.01
+    },
     "ba4.sd1": {
       "set_curr": "MG-BA4:SD1-Iadd:Set",
       "meas_curr": "MG-BA4:SD1-Ipoi:Mea",
@@ -521,21 +536,6 @@
       "min_val": -6,
       "model_name": [
         "ba4.sd2"
-      ],
-      "step": 0.01
-    },
-    "ba4.sf2": {
-      "set_curr": "MG-BA4:SF2-Iadd:Set",
-      "meas_curr": "MG-BA4:SF2-Ipoi:Mea",
-      "put_curr": "MG-BA4:SF2-Iadd:Set",
-      "coeffs": [
-        9.495984
-      ],
-      "activate": "MG-BA4:SF2-PSON:Cmd",
-      "max_val": 6,
-      "min_val": -6,
-      "model_name": [
-        "ba4.sf2"
       ],
       "step": 0.01
     }

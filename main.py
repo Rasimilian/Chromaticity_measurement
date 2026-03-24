@@ -227,6 +227,8 @@ class DataManager(QObject):
 
     def initialize_bpm_pv(self, bpm_to_observe):
         if self.bpm_x_pv is not None:
+            self.bpm_x_pv.remove_callback(0)
+            self.bpm_y_pv.remove_callback(0)
             self.bpm_x_pv.disconnect()
             self.bpm_y_pv.disconnect()
         pvx = knobs["bpm"][bpm_to_observe]["turns_h"]
@@ -289,39 +291,43 @@ class DataManager(QObject):
     def _find_satellites_peaks(self, q0, qs, freq_spectrum, amplitude_spectrum):
         ampl_q0_minus_satellite = 0
         ampl_q0_plus_satellite = 0
-        idx_q0_minus_satellite = np.argmin(np.abs(freq_spectrum - (q0 - qs)))
-        if 0 < idx_q0_minus_satellite < len(freq_spectrum) - 1:
-            neighbors = [idx_q0_minus_satellite - 1, idx_q0_minus_satellite, idx_q0_minus_satellite + 1]
-            ampl_q0_minus_satellite = np.max(amplitude_spectrum[neighbors])
-        idx_q0_plus_satellite = np.argmin(np.abs(freq_spectrum - (q0 + qs)))
-        if 0 < idx_q0_plus_satellite < len(freq_spectrum) - 1:
-            neighbors = [idx_q0_plus_satellite - 1, idx_q0_plus_satellite, idx_q0_plus_satellite + 1]
-            ampl_q0_plus_satellite = np.max(amplitude_spectrum[neighbors])
+        idx_q0_minus_satellite = 0
+        idx_q0_plus_satellite = 0
+        if len(freq_spectrum) > 0:
+            idx_q0_minus_satellite = np.argmin(np.abs(freq_spectrum - (q0 - qs)))
+            if 0 < idx_q0_minus_satellite < len(freq_spectrum) - 1:
+                neighbors = [idx_q0_minus_satellite - 1, idx_q0_minus_satellite, idx_q0_minus_satellite + 1]
+                ampl_q0_minus_satellite = np.max(amplitude_spectrum[neighbors])
+            idx_q0_plus_satellite = np.argmin(np.abs(freq_spectrum - (q0 + qs)))
+            if 0 < idx_q0_plus_satellite < len(freq_spectrum) - 1:
+                neighbors = [idx_q0_plus_satellite - 1, idx_q0_plus_satellite, idx_q0_plus_satellite + 1]
+                ampl_q0_plus_satellite = np.max(amplitude_spectrum[neighbors])
         return idx_q0_minus_satellite, ampl_q0_minus_satellite, idx_q0_plus_satellite, ampl_q0_plus_satellite
 
     def analyze_data(self, x, y):
-        qx, qx_amplitude, freq_spectrum_qx, amplitude_spectrum_qx,  = get_spectrum(x, self.data["turns"], self.freq_range_qx)
-        qy, qy_amplitude, freq_spectrum_qy, amplitude_spectrum_qy = get_spectrum(y, self.data["turns"], self.freq_range_qy)
-        qs, _, _, _ = get_spectrum(x, self.data["turns"], self.freq_range_qs)
+        if len(x) > 0:
+            qx, qx_amplitude, freq_spectrum_qx, amplitude_spectrum_qx,  = get_spectrum(x, self.data["turns"], self.freq_range_qx)
+            qy, qy_amplitude, freq_spectrum_qy, amplitude_spectrum_qy = get_spectrum(y, self.data["turns"], self.freq_range_qy)
+            qs, _, _, _ = get_spectrum(x, self.data["turns"], self.freq_range_qs)
 
-        idx_qx_minus_satellite, ampl_qx_minus_satellite, idx_qx_minus_satellite, ampl_qx_plus_satellite = self._find_satellites_peaks(qx, qs, freq_spectrum_qx, amplitude_spectrum_qx)
-        idx_qy_minus_satellite, ampl_qy_minus_satellite, idx_qy_minus_satellite, ampl_qy_plus_satellite = self._find_satellites_peaks(qy, qs, freq_spectrum_qy, amplitude_spectrum_qy)
+            idx_qx_minus_satellite, ampl_qx_minus_satellite, idx_qx_minus_satellite, ampl_qx_plus_satellite = self._find_satellites_peaks(qx, qs, freq_spectrum_qx, amplitude_spectrum_qx)
+            idx_qy_minus_satellite, ampl_qy_minus_satellite, idx_qy_minus_satellite, ampl_qy_plus_satellite = self._find_satellites_peaks(qy, qs, freq_spectrum_qy, amplitude_spectrum_qy)
 
-        self.data["cx"] = qs / self.data["sigma_E_spread"] * np.sqrt((ampl_qx_plus_satellite + ampl_qx_minus_satellite) / qx_amplitude)
-        self.data["cy"] = qs / self.data["sigma_E_spread"] * np.sqrt((ampl_qy_plus_satellite + ampl_qy_minus_satellite) / qy_amplitude)
-        self.data["qs"] = qs
+            self.data["cx"] = qs / self.data["sigma_E_spread"] * np.sqrt((ampl_qx_plus_satellite + ampl_qx_minus_satellite) / qx_amplitude)
+            self.data["cy"] = qs / self.data["sigma_E_spread"] * np.sqrt((ampl_qy_plus_satellite + ampl_qy_minus_satellite) / qy_amplitude)
+            self.data["qs"] = qs
 
-        self.data["qx"] = qx
-        self.data["qx_m"] = qx - qs
-        self.data["qx_p"] = qx + qs
-        self.data["freq_spectrum_qx"] = freq_spectrum_qx
-        self.data["amplitude_spectrum_qx"] = amplitude_spectrum_qx
+            self.data["qx"] = qx
+            self.data["qx_m"] = qx - qs
+            self.data["qx_p"] = qx + qs
+            self.data["freq_spectrum_qx"] = freq_spectrum_qx
+            self.data["amplitude_spectrum_qx"] = amplitude_spectrum_qx
 
-        self.data["qy"] = qy
-        self.data["qy_m"] = qy - qs
-        self.data["qy_p"] = qy + qs
-        self.data["freq_spectrum_qy"] = freq_spectrum_qy
-        self.data["amplitude_spectrum_qy"] = amplitude_spectrum_qy
+            self.data["qy"] = qy
+            self.data["qy_m"] = qy - qs
+            self.data["qy_p"] = qy + qs
+            self.data["freq_spectrum_qy"] = freq_spectrum_qy
+            self.data["amplitude_spectrum_qy"] = amplitude_spectrum_qy
 
 
 class MainWindow(QMainWindow):
