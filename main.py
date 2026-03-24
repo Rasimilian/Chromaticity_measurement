@@ -31,40 +31,32 @@ class MplCanvas(FigureCanvas):
         self.setParent(parent)
         self.fig.tight_layout(pad=3.0)
 
-        # Включаем интерактивный режим
         self.setFocusPolicy(Qt.StrongFocus)
 
-        # Сохраняем текущий масштаб и исходный
         self.saved_xlim = None
         self.saved_ylim = None
         self.original_xlim = None
         self.original_ylim = None
         self.initial_zoom_saved = False
 
-        # Переменные для панорамирования
         self.pan_start_x = None
         self.pan_start_y = None
         self.pan_start_xlim = None
         self.pan_start_ylim = None
         self.panning = False
 
-        # Подключаем обработчики событий
         self.mpl_connect('scroll_event', self.on_scroll)
         self.mpl_connect('button_press_event', self.on_press)
         self.mpl_connect('motion_notify_event', self.on_motion)
         self.mpl_connect('button_release_event', self.on_release)
 
-        # Добавляем QPushButton поверх графика
         self.add_reset_button()
 
     def add_reset_button(self):
-        """Добавляет QPushButton поверх графика в левом нижнем углу"""
         from PyQt5.QtWidgets import QPushButton
 
-        # Создаем кнопку
         self.reset_button = QPushButton('Reset', self)
 
-        # Применяем стиль
         reset_button_style = """
             QPushButton {
                 background-color: #6c757d;
@@ -84,28 +76,21 @@ class MplCanvas(FigureCanvas):
         """
         self.reset_button.setStyleSheet(reset_button_style)
 
-        # Устанавливаем размер кнопки
         self.reset_button.setFixedSize(60, 28)
 
-        # Подключаем сигнал
         self.reset_button.clicked.connect(self.on_reset_click)
 
-        # Позиционируем кнопку (будет обновляться при resize)
         self.reset_button.move(10, self.height() - 40)
 
     def on_reset_click(self):
-        """Обработчик нажатия кнопки сброса"""
         self.reset_zoom()
 
     def resizeEvent(self, event):
-        """Обновляет позицию кнопки при изменении размера графика"""
         super().resizeEvent(event)
         if hasattr(self, 'reset_button'):
-            # Позиционируем кнопку в левом нижнем углу с отступами
             self.reset_button.move(10, self.height() - 40)
 
     def on_scroll(self, event):
-        """Обработчик прокрутки колесика мыши для масштабирования"""
         if event.inaxes != self.ax:
             return
 
@@ -139,8 +124,6 @@ class MplCanvas(FigureCanvas):
         self.draw_idle()
 
     def on_press(self, event):
-        """Обработчик нажатия кнопки мыши для панорамирования"""
-        # Панорамирование только при зажатой правой кнопке мыши (button=3)
         if event.inaxes != self.ax or event.button != 3:
             return
 
@@ -150,18 +133,15 @@ class MplCanvas(FigureCanvas):
         self.pan_start_xlim = self.ax.get_xlim()
         self.pan_start_ylim = self.ax.get_ylim()
 
-        # Меняем курсор
         self.setCursor(Qt.ClosedHandCursor)
 
     def on_motion(self, event):
-        """Обработчик движения мыши для панорамирования"""
         if not self.panning or event.inaxes != self.ax:
             return
 
         dx = event.xdata - self.pan_start_x
         dy = event.ydata - self.pan_start_y
 
-        # Сдвигаем пределы
         xlim = (self.pan_start_xlim[0] - dx, self.pan_start_xlim[1] - dx)
         ylim = (self.pan_start_ylim[0] - dy, self.pan_start_ylim[1] - dy)
 
@@ -174,34 +154,28 @@ class MplCanvas(FigureCanvas):
         self.draw_idle()
 
     def on_release(self, event):
-        """Обработчик отпускания кнопки мыши"""
         self.panning = False
         self.setCursor(Qt.ArrowCursor)
 
     def save_current_zoom(self):
-        """Сохраняет текущий масштаб"""
         self.saved_xlim = self.ax.get_xlim()
         self.saved_ylim = self.ax.get_ylim()
 
     def restore_zoom(self):
-        """Восстанавливает сохраненный масштаб"""
         if self.saved_xlim is not None and self.saved_ylim is not None:
             self.ax.set_xlim(self.saved_xlim)
             self.ax.set_ylim(self.saved_ylim)
 
     def save_original_zoom(self):
-        """Сохраняет исходный масштаб (автоматический)"""
         xlim = self.ax.get_xlim()
         ylim = self.ax.get_ylim()
 
-        # Проверяем, что масштаб не является дефолтным [0,1]
         if xlim != (0.0, 1.0) or ylim != (0.0, 1.0):
             self.original_xlim = xlim
             self.original_ylim = ylim
             self.initial_zoom_saved = True
 
     def reset_zoom(self):
-        """Сбрасывает масштаб к исходному"""
         if self.original_xlim is not None and self.original_ylim is not None:
             self.ax.set_xlim(self.original_xlim)
             self.ax.set_ylim(self.original_ylim)
@@ -209,7 +183,6 @@ class MplCanvas(FigureCanvas):
             self.saved_ylim = self.original_ylim
             self.draw_idle()
         else:
-            # Если исходный масштаб не сохранен, используем autoscale
             self.ax.autoscale()
             self.saved_xlim = self.ax.get_xlim()
             self.saved_ylim = self.ax.get_ylim()
@@ -219,11 +192,11 @@ class MplCanvas(FigureCanvas):
 class DataManager(QObject):
     data_updated = pyqtSignal()
 
-    def __init__(self, bpm_to_observe):
+    def __init__(self, knobs):
         super().__init__()
         self.data = {"x": [np.nan], "cx": np.nan, "qx": np.nan, "qx_m": np.nan, "qx_p": np.nan, "freq_spectrum_qx": [np.nan], "amplitude_spectrum_qx": [np.nan],
                      "y": [np.nan], "cy": np.nan, "qy": np.nan, "qy_m": np.nan, "qy_p": np.nan, "freq_spectrum_qy": [np.nan], "amplitude_spectrum_qy": [np.nan],
-                     "qs": np.nan, "sigma_E_spread": 0.01, "Energy": 0.2, "turns": 512}
+                     "qs": np.nan, "sigma_E_spread": knobs["constants"]["sigma_E_spread"], "energy": knobs["constants"]["energy"], "turns": knobs["constants"]["turns"]}
 
         self.max_length = 100
         self.freq_range_qx = [0.3, 0.41]
@@ -232,11 +205,18 @@ class DataManager(QObject):
         self.cx_array = deque(maxlen=self.max_length)
         self.cy_array = deque(maxlen=self.max_length)
 
-        self.bpm_to_observe = bpm_to_observe
+        self.bpm_to_observe = knobs["constants"]["bpm_to_observe"]
         self.bpm_x_pv = self.bpm_y_pv = None
-        self.initialize_data(self.bpm_to_observe)
+        self.sextupole_set_values = {}
+        self.sextupole_set_pvs = {}
+        self.sextupole_name_to_pvset_name_map = {}
+        self.sextupole_meas_values = {}
+        self.sextupole_meas_pvs = {}
+        self.sextupole_name_to_pvmeas_name_map = {}
+        self.initialize_bpm_pv(self.bpm_to_observe)
+        self.initialize_sextupole_pv()
 
-    def initialize_data(self, bpm_to_observe):
+    def initialize_bpm_pv(self, bpm_to_observe):
         if self.bpm_x_pv is not None:
             self.bpm_x_pv.disconnect()
             self.bpm_y_pv.disconnect()
@@ -248,6 +228,21 @@ class DataManager(QObject):
         self.bpm_x_pv.connect()
         self.bpm_y_pv = PV(pvy, callback=self.update_data_callback)
         self.bpm_y_pv.connect()
+
+    def initialize_sextupole_pv(self):
+        for sext_name, sext_config in knobs["sextupole"].items():
+            pv_set_name = sext_config["set_curr"]
+            pv_set = PV(pv_set_name, callback=self.sextupole_callback)
+            pv_set.connect()
+            self.sextupole_set_pvs[pv_set_name] = pv_set
+            self.sextupole_set_values[pv_set_name] = pv_set.value
+            self.sextupole_name_to_pvset_name_map[sext_name] = pv_set_name
+            pv_meas_name = sext_config["set_curr"]
+            pv_meas = PV(pv_meas_name, callback=self.sextupole_callback)
+            pv_meas.connect()
+            self.sextupole_meas_pvs[pv_meas_name] = pv_meas
+            self.sextupole_meas_values[pv_meas_name] = pv_meas.value
+            self.sextupole_name_to_pvmeas_name_map[sext_name] = pv_meas_name
 
     def update_data_callback(self, pvname=None, value=None, **kw):
         if not self.pvs_updated[pvname]:
@@ -270,6 +265,12 @@ class DataManager(QObject):
 
         for pv in self.pvs_updated:
             self.pvs_updated[pv] = False
+
+    def sextupole_callback(self, pvname=None, value=None, **kw):
+        if pvname in self.sextupole_set_pvs:
+            self.sextupole_set_values[pvname] = value
+        if pvname in self.sextupole_meas_pvs:
+            self.sextupole_meas_values[pvname] = value
 
     def _find_satellites_peaks(self, q0, qs, freq_spectrum, amplitude_spectrum):
         ampl_q0_minus_satellite = 0
@@ -315,7 +316,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Chromaticity measurement")
         self.setGeometry(100, 100, 1400, 900)
 
-        self.data_manager = DataManager(knobs["constants"]["bpm_to_observe"])
+        self.data_manager = DataManager(knobs)
 
         self.data_manager.data_updated.connect(self.update_plots)
         self.data_manager.data_updated.connect(self.update_fields)
@@ -412,7 +413,7 @@ class MainWindow(QMainWindow):
         self.field3 = QLineEdit()
         self.field4 = QLineEdit()
         self.field5 = QLineEdit()
-        self.field5 = QLineEdit()
+        self.field6 = QLineEdit()
 
         self.field1.setStyleSheet(text_field_style)
         self.field2.setStyleSheet(text_field_style)
@@ -429,10 +430,11 @@ class MainWindow(QMainWindow):
         fields_layout.addRow("Qy (manual):", self.field6)
 
         self.field1.setReadOnly(False)
-        self.field1.setText("0.01")
+        self.field1.setText(str(self.data_manager.data["sigma_E_spread"]))
         self.field2.setReadOnly(False)
-        self.field2.setText("0.2")
+        self.field2.setText(str(self.data_manager.data["energy"]))
         self.field3.setReadOnly(False)
+        self.field3.setText(str(int(self.data_manager.data["turns"])))
         self.field4.setReadOnly(False)
         self.field5.setReadOnly(False)
         self.field6.setReadOnly(False)
@@ -652,25 +654,8 @@ class MainWindow(QMainWindow):
 
     def update_fields(self):
         self.data_manager.data["sigma_E_spread"] = abs(float(self.field1.text()))
-        self.data_manager.data["Energy"] = abs(float(self.field2.text()))
-        self.data_manager.data["turns"] = abs(float(self.field3.text()))
-
-        self.text_field1.setText(f"None")
-
-        if self.field3.text():
-            try:
-                manual_qs = float(self.field3.text())
-                self.text_field2.setText(f"Manual Qs: {manual_qs:.4f}")
-            except ValueError:
-                pass
-
-        if self.field4.text() and self.field5.text():
-            try:
-                manual_qx = float(self.field4.text())
-                manual_qy = float(self.field5.text())
-                self.text_field3.setText(f"Manual Qx: {manual_qx:.4f}, Qy: {manual_qy:.4f}")
-            except ValueError:
-                pass
+        self.data_manager.data["energy"] = abs(float(self.field2.text()))
+        self.data_manager.data["turns"] = abs(int(float(self.field3.text())))
 
     def update_plots(self):
         self.canvases[0].ax.clear()
@@ -817,7 +802,7 @@ class MainWindow(QMainWindow):
         button = self.sender()
         bpm = button.text()
         self.data_manager.bpm_to_observe = bpm
-        self.initialize_data(bpm)
+        self.data_manager.initialize_bpm_pv(bpm)
 
     def function2(self):
         pass

@@ -4,7 +4,9 @@
     "current_units": "A",
     "energy": 0.2,
     "alpha": 0.0088456,
-    "bpm_to_observe": "BA1.PK2"
+    "sigma_E_spread": 0.01,
+    "bpm_to_observe": "BA1.PK2",
+    "turns": 512
   },
   "bpm": {
     "BIS.PK2": {
