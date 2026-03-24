@@ -25,11 +25,11 @@ def find_three_peaks(array, start, stop):
 
 
 def get_spectrum(signal, nturns, freq_range):
-    freq, freq_spectrum, amplitude_spectrum, main_freq_amplitude = naff(signal, nturns, nterms=1, skipTurns=0, window=1, freq_range=freq_range)
-    main_freq = freq[0][1] if freq[0][1] <= 0.5 else (1 - freq[0][1])
+    nturns = min(nturns, len(signal))
+    main_freq, main_freq_amplitude, freq_spectrum, amplitude_spectrum = 0, 0, [], []
+    try:
+        freq, freq_spectrum, amplitude_spectrum, main_freq_amplitude = naff(signal, nturns, nterms=1, skipTurns=0, window=1, freq_range=freq_range)
+        main_freq = freq[0][1] if freq[0][1] <= 0.5 else (1 - freq[0][1])
+    except ValueError:
+        print(f"Data size is less than turns {nturns}")
     return main_freq, main_freq_amplitude, freq_spectrum, amplitude_spectrum
-
-
-def get_main_tune_and_satellites():
-    main_freq, freq_spectrum, amplitude_spectrum = get_spectrum()
-    peaks = find_three_peaks(amplitude_spectrum, int(0.6 * nturns // 2), nturns // 2)
