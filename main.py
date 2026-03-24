@@ -223,10 +223,9 @@ class DataManager(QObject):
         super().__init__()
         self.data = {"x": [np.nan], "cx": np.nan, "qx": np.nan, "qx_m": np.nan, "qx_p": np.nan, "freq_spectrum_qx": [np.nan], "amplitude_spectrum_qx": [np.nan],
                      "y": [np.nan], "cy": np.nan, "qy": np.nan, "qy_m": np.nan, "qy_p": np.nan, "freq_spectrum_qy": [np.nan], "amplitude_spectrum_qy": [np.nan],
-                     "qs": np.nan, "sigma_E_spread": 0.01, "Energy": 0.2}
+                     "qs": np.nan, "sigma_E_spread": 0.01, "Energy": 0.2, "turns": 512}
 
         self.max_length = 100
-        self.nturns = 512
         self.freq_range_qx = [0.3, 0.41]
         self.freq_range_qy = [0.3, 0.41]
         self.freq_range_qs = [0.01, 0.1]
@@ -234,15 +233,21 @@ class DataManager(QObject):
         self.cy_array = deque(maxlen=self.max_length)
 
         self.bpm_to_observe = bpm_to_observe
+        self.bpm_x_pv = self.bpm_y_pv = None
         self.initialize_data(self.bpm_to_observe)
 
     def initialize_data(self, bpm_to_observe):
-        self.pvs_updated = {"VEPP3:4P5:X-I": False, "VEPP3:4P5:Y-I": False}
-        self.pvs_to_plane_map = {"VEPP3:4P5:X-I": "x", "VEPP3:4P5:Y-I": "y"}
-        self.bpm_x_array = PV("VEPP3:4P5:X-I", callback=self.update_data_callback)
-        self.bpm_x_array.connect()
-        self.bpm_y_array = PV("VEPP3:4P5:Y-I", callback=self.update_data_callback)
-        self.bpm_y_array.connect()
+        if self.bpm_x_pv is not None:
+            self.bpm_x_pv.disconnect()
+            self.bpm_y_pv.disconnect()
+        pvx = knobs["bpm"][bpm_to_observe]["turns_h"]
+        pvy = knobs["bpm"][bpm_to_observe]["turns_v"]
+        self.pvs_updated = {pvx: False, pvy: False}
+        self.pvs_to_plane_map = {pvx: "x", pvy: "y"}
+        self.bpm_x_pv = PV(pvx, callback=self.update_data_callback)
+        self.bpm_x_pv.connect()
+        self.bpm_y_pv = PV(pvy, callback=self.update_data_callback)
+        self.bpm_y_pv.connect()
 
     def update_data_callback(self, pvname=None, value=None, **kw):
         if not self.pvs_updated[pvname]:
@@ -280,9 +285,9 @@ class DataManager(QObject):
         return idx_q0_minus_satellite, ampl_q0_minus_satellite, idx_q0_plus_satellite, ampl_q0_plus_satellite
 
     def analyze_data(self, x, y):
-        qx, qx_amplitude, freq_spectrum_qx, amplitude_spectrum_qx,  = get_spectrum(x, self.nturns, self.freq_range_qx)
-        qy, qy_amplitude, freq_spectrum_qy, amplitude_spectrum_qy = get_spectrum(y, self.nturns, self.freq_range_qy)
-        qs, _, _, _ = get_spectrum(x, self.nturns, self.freq_range_qs)
+        qx, qx_amplitude, freq_spectrum_qx, amplitude_spectrum_qx,  = get_spectrum(x, self.data["turns"], self.freq_range_qx)
+        qy, qy_amplitude, freq_spectrum_qy, amplitude_spectrum_qy = get_spectrum(y, self.data["turns"], self.freq_range_qy)
+        qs, _, _, _ = get_spectrum(x, self.data["turns"], self.freq_range_qs)
 
         idx_qx_minus_satellite, ampl_qx_minus_satellite, idx_qx_minus_satellite, ampl_qx_plus_satellite = self._find_satellites_peaks(qx, qs, freq_spectrum_qx, amplitude_spectrum_qx)
         idx_qy_minus_satellite, ampl_qy_minus_satellite, idx_qy_minus_satellite, ampl_qy_plus_satellite = self._find_satellites_peaks(qy, qs, freq_spectrum_qy, amplitude_spectrum_qy)
@@ -407,18 +412,21 @@ class MainWindow(QMainWindow):
         self.field3 = QLineEdit()
         self.field4 = QLineEdit()
         self.field5 = QLineEdit()
+        self.field5 = QLineEdit()
 
         self.field1.setStyleSheet(text_field_style)
         self.field2.setStyleSheet(text_field_style)
         self.field3.setStyleSheet(text_field_style)
         self.field4.setStyleSheet(text_field_style)
         self.field5.setStyleSheet(text_field_style)
+        self.field6.setStyleSheet(text_field_style)
 
         fields_layout.addRow("SigmaE/E:", self.field1)
         fields_layout.addRow("Energy (Gev):", self.field2)
-        fields_layout.addRow("Qs (manual):", self.field3)
-        fields_layout.addRow("Qx (manual):", self.field4)
-        fields_layout.addRow("Qy (manual):", self.field5)
+        fields_layout.addRow("Turns:", self.field3)
+        fields_layout.addRow("Qs (manual):", self.field4)
+        fields_layout.addRow("Qx (manual):", self.field5)
+        fields_layout.addRow("Qy (manual):", self.field6)
 
         self.field1.setReadOnly(False)
         self.field1.setText("0.01")
@@ -427,6 +435,7 @@ class MainWindow(QMainWindow):
         self.field3.setReadOnly(False)
         self.field4.setReadOnly(False)
         self.field5.setReadOnly(False)
+        self.field6.setReadOnly(False)
 
         fields_group.setLayout(fields_layout)
 
@@ -644,15 +653,13 @@ class MainWindow(QMainWindow):
     def update_fields(self):
         self.data_manager.data["sigma_E_spread"] = abs(float(self.field1.text()))
         self.data_manager.data["Energy"] = abs(float(self.field2.text()))
+        self.data_manager.data["turns"] = abs(float(self.field3.text()))
 
-        # ИЗМЕНЕНИЕ: Обновляем статусные поля
         self.text_field1.setText(f"None")
 
-        # Обновляем значения qs и qx/qy, если они введены вручную
         if self.field3.text():
             try:
                 manual_qs = float(self.field3.text())
-                # Здесь можно добавить логику использования manual_qs
                 self.text_field2.setText(f"Manual Qs: {manual_qs:.4f}")
             except ValueError:
                 pass
@@ -671,6 +678,12 @@ class MainWindow(QMainWindow):
         y = self.data_manager.data["x"]
         self.canvases[0].ax.plot(x, y, 'b-', linewidth=2)
         self.canvases[0].ax.set_title(self.data_manager.bpm_to_observe)
+        self.canvases[0].ax.axvline(self.data_manager.data["turns"], color='black', linestyle='--', alpha=0.5)
+        self.canvases[0].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
+                                     xy=(self.data_manager.data["turns"], max(y) * 0.5),
+                                     xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.5),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[0].ax.set_xlabel('Turn')
         self.canvases[0].ax.set_ylabel('X')
         self.canvases[0].ax.grid(True, alpha=0.3)
@@ -726,6 +739,12 @@ class MainWindow(QMainWindow):
         y = self.data_manager.data["y"]
         self.canvases[3].ax.plot(x, y, 'r-', linewidth=2)
         self.canvases[3].ax.set_title(self.data_manager.bpm_to_observe)
+        self.canvases[3].ax.axvline(self.data_manager.data["turns"], color='black', linestyle='--', alpha=0.5)
+        self.canvases[3].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
+                                     xy=(self.data_manager.data["turns"], max(y) * 0.5),
+                                     xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.5),
+                                     fontsize=8, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[3].ax.set_xlabel('Turn')
         self.canvases[3].ax.set_ylabel('Y')
         self.canvases[3].ax.grid(True, alpha=0.3)
@@ -798,6 +817,7 @@ class MainWindow(QMainWindow):
         button = self.sender()
         bpm = button.text()
         self.data_manager.bpm_to_observe = bpm
+        self.initialize_data(bpm)
 
     def function2(self):
         pass
