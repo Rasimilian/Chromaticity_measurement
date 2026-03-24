@@ -3,6 +3,7 @@ import numpy as np
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QGridLayout, QPushButton, QLabel,
                              QLineEdit, QGroupBox, QFormLayout, QSpinBox, QButtonGroup)
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtCore import QTimer, Qt, pyqtSignal, QObject
 from PyQt5.QtGui import QFont
 import matplotlib.pyplot as plt
@@ -191,6 +192,7 @@ class MplCanvas(FigureCanvas):
 
 class DataManager(QObject):
     data_updated = pyqtSignal()
+    sextupole_updated = pyqtSignal(str)
 
     def __init__(self, knobs):
         super().__init__()
@@ -237,12 +239,14 @@ class DataManager(QObject):
             self.sextupole_set_pvs[pv_set_name] = pv_set
             self.sextupole_set_values[pv_set_name] = pv_set.value
             self.sextupole_name_to_pvset_name_map[sext_name] = pv_set_name
-            pv_meas_name = sext_config["set_curr"]
+            self.sextupole_updated.emit(pv_set_name)
+            pv_meas_name = sext_config["meas_curr"]
             pv_meas = PV(pv_meas_name, callback=self.sextupole_callback)
             pv_meas.connect()
             self.sextupole_meas_pvs[pv_meas_name] = pv_meas
             self.sextupole_meas_values[pv_meas_name] = pv_meas.value
             self.sextupole_name_to_pvmeas_name_map[sext_name] = pv_meas_name
+            self.sextupole_updated.emit(pv_meas_name)
 
     def update_data_callback(self, pvname=None, value=None, **kw):
         if not self.pvs_updated[pvname]:
@@ -271,6 +275,7 @@ class DataManager(QObject):
             self.sextupole_set_values[pvname] = value
         if pvname in self.sextupole_meas_pvs:
             self.sextupole_meas_values[pvname] = value
+        self.sextupole_updated.emit(pvname)
 
     def _find_satellites_peaks(self, q0, qs, freq_spectrum, amplitude_spectrum):
         ampl_q0_minus_satellite = 0
@@ -320,6 +325,7 @@ class MainWindow(QMainWindow):
 
         self.data_manager.data_updated.connect(self.update_plots)
         self.data_manager.data_updated.connect(self.update_fields)
+        self.data_manager.sextupole_updated.connect(self.fill_sextupoles_field)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -338,7 +344,7 @@ class MainWindow(QMainWindow):
 
         self.init_range_selectors()
 
-        buttons_layout = QHBoxLayout()
+        buttons_layout = QGridLayout()
         self.button_group = QButtonGroup()
         self.button_group.setExclusive(True)
         button_style = """
@@ -365,7 +371,7 @@ class MainWindow(QMainWindow):
         bpms = list(knobs["bpm"].keys())
         bpm_to_observe = knobs["constants"]["bpm_to_observe"]
         self.buttons = []
-        for bpm in bpms:
+        for idx, bpm in enumerate(bpms):
             btn = QPushButton(bpm)
             btn.setStyleSheet(button_style)
             btn.setCheckable(True)
@@ -376,8 +382,11 @@ class MainWindow(QMainWindow):
             btn.clicked.connect(self.choose_bpm)
             self.buttons.append(btn)
             self.button_group.addButton(btn)
-            buttons_layout.addWidget(btn)
-        buttons_layout.addStretch()
+            if idx < len(bpms) / 2:
+                buttons_layout.addWidget(btn, 0, idx)
+            else:
+                print(idx, len(bpms))
+                buttons_layout.addWidget(btn, 1, idx - len(bpms) // 2)
 
         text_field_style = """
             QLineEdit {
@@ -523,62 +532,67 @@ class MainWindow(QMainWindow):
         control_buttons_layout.addLayout(spinbox_buttons_layout)
         control_buttons_group.setLayout(control_buttons_layout)
 
-        text_fields_group = QGroupBox("Sextupoles")
-        text_fields_group.setFont(QFont("Arial", 10, QFont.Bold))
-        text_fields_group.setMaximumWidth(250)
-        text_fields_layout = QVBoxLayout()
-        text_fields_layout.setSpacing(8)
+        sextupoles_fields_group = QGroupBox("Sextupoles")
+        sextupoles_fields_group.setFont(QFont("Arial", 10, QFont.Bold))
+        sextupoles_fields_layout = QGridLayout()
+        sextupoles_fields_layout.setSpacing(8)
 
-        text_field_style = """
-            QLineEdit {
-                background-color: #ffffff;
-                border: 1px solid #dee2e6;
-                border-radius: 8px;
-                padding: 6px 10px;
-                font-family: 'Arial', sans-serif;
+        button_style = """
+            QPushButton {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 10px 20px;
                 font-size: 14px;
-                color: #000000;
+                font-weight: bold;
+                border-radius: 5px;
             }
-            QLineEdit:focus {
-                border-color: #80bdff;
-                background-color: #ffffff;
-                outline: 0;
-                color: #000000;
+            QPushButton:hover {
+                background-color: #45a049;
             }
-            QLineEdit:read-only {
-                background-color: #f5f5f5;
-                color: #000000;
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+            QPushButton:checked {
+                background-color: #ff5722;
+                border: 2px solid #ff9800;
             }
         """
 
-        self.text_field1 = QLineEdit()
-        self.text_field1.setPlaceholderText("Status message 1")
-        self.text_field1.setReadOnly(True)
-        self.text_field1.setStyleSheet(text_field_style)
+        self.sextupole_buttons = []
+        self.sextupole_set_fields = {}
+        self.sextupole_meas_fields = {}
+        for idx, (sext, sext_data) in enumerate(knobs["sextupole"].items()):
+            btn = QPushButton(sext)
+            btn.setStyleSheet(button_style)
+            # btn.setFixedSize(60, 50)
+            self.sextupole_buttons.append(btn)
+            sextupoles_fields_layout.addWidget(btn, 0, idx)
 
-        self.text_field2 = QLineEdit()
-        self.text_field2.setPlaceholderText("Status message 2")
-        self.text_field2.setReadOnly(True)
-        self.text_field2.setStyleSheet(text_field_style)
+            text_field = QLineEdit()
+            text_field.setPlaceholderText(f"Set")
+            text_field.setReadOnly(True)
+            text_field.setStyleSheet(text_field_style)
+            self.sextupole_set_fields[sext_data["set_curr"]] = text_field
+            sextupoles_fields_layout.addWidget(text_field, 1, idx)
 
-        self.text_field3 = QLineEdit()
-        self.text_field3.setPlaceholderText("Status message 3")
-        self.text_field3.setReadOnly(True)
-        self.text_field3.setStyleSheet(text_field_style)
+            text_field = QLineEdit()
+            text_field.setPlaceholderText(f"Meas")
+            text_field.setReadOnly(True)
+            text_field.setStyleSheet(text_field_style)
+            self.sextupole_meas_fields[sext_data["meas_curr"]] = text_field
+            sextupoles_fields_layout.addWidget(text_field, 2, idx)
 
-        text_fields_layout.addWidget(self.text_field1)
-        text_fields_layout.addWidget(self.text_field2)
-        text_fields_layout.addWidget(self.text_field3)
-        text_fields_group.setLayout(text_fields_layout)
+        sextupoles_fields_group.setLayout(sextupoles_fields_layout)
 
         right_panel_layout.addWidget(fields_group)
         right_panel_layout.addWidget(control_buttons_group)
-        right_panel_layout.addWidget(text_fields_group)
+        right_panel_layout.addWidget(sextupoles_fields_group)
         right_panel_layout.addStretch()
 
-        main_layout.addLayout(plots_layout)
-        main_layout.addLayout(buttons_layout)
-        main_layout.addLayout(right_panel_layout)
+        main_layout.addLayout(plots_layout, 7)
+        main_layout.addLayout(buttons_layout, 1)
+        main_layout.addLayout(right_panel_layout, 2)
 
     def init_range_selectors(self):
         self.x_tune_range_selector = RangeSelectorGraph(
@@ -633,6 +647,14 @@ class MainWindow(QMainWindow):
 
     def on_reset_button_clicked(self):
         pass
+
+    def fill_sextupoles_field(self, pvname):
+        if pvname in self.sextupole_set_fields:
+            text_field = self.sextupole_set_fields[pvname]
+            text_field.setText(f"{self.data_manager.sextupole_set_values[pvname]:.3f}")
+        if pvname in self.sextupole_meas_fields:
+            text_field = self.sextupole_meas_fields[pvname]
+            text_field.setText(f"{self.data_manager.sextupole_meas_values[pvname]:.3f}")
 
     def change_spinbox_value(self, spinbox_id, delta):
         if spinbox_id == 1:
