@@ -803,7 +803,7 @@ class MainWindow(QMainWindow):
         qy_p = self.data_manager.data["qy_p"]
         self.canvases[4].ax.plot(x, y, 'r-', linewidth=2)
         self.canvases[4].ax.set_title(self.data_manager.bpm_to_observe)
-        self.canvases[4].ax.set_xlabel('Tune Qx')
+        self.canvases[4].ax.set_xlabel('Tune Qy')
         self.canvases[4].ax.set_ylabel('Amplitude')
         self.canvases[4].ax.axvline(qy, color='black', linestyle='--', alpha=0.5)
         self.canvases[4].ax.annotate(f'Qy = {qy:.3f}',
