@@ -262,6 +262,8 @@ class DataManager(QObject):
     def update_data_callback(self, pvname=None, value=None, **kw):
         if not self.pvs_updated[pvname]:
             plane = self.pvs_to_plane_map[pvname]
+            if not len(value):
+                value = [np.nan]
             self.data[plane] = value - np.nanmean(value)
             # self.data[plane] = test_data - np.nanmean(test_data)
             # self.data[plane] += np.max(self.data[plane]) * 1e-1 * np.random.random(len(test_data))

@@ -27,7 +27,7 @@ def find_three_peaks(array, start, stop):
 
 def get_spectrum(signal, nturns, freq_range):
     nturns = min(nturns, len(signal))
-    main_freq, main_freq_amplitude, freq_spectrum, amplitude_spectrum = np.nan, np.nan, np.array([]), np.array([])
+    main_freq, main_freq_amplitude, freq_spectrum, amplitude_spectrum = np.nan, np.nan, np.array([np.nan]), np.array([np.nan])
     try:
         freq, freq_spectrum, amplitude_spectrum, main_freq_amplitude = naff(signal, nturns, nterms=1, skipTurns=0, window=1, freq_range=freq_range)
         main_freq = freq[0][1] if freq[0][1] <= 0.5 else (1 - freq[0][1])

@@ -249,7 +249,7 @@ def naff(data, turns: int, nterms: int, skipTurns: int, window: int, freq_range:
 
         if INDX == 0:
             print('## PyNAFF::naff: Remove the DC component from the data (i.e. the mean).')
-            return np.zeros((1, 5)), [], [], np.nan
+            return np.zeros((1, 5)), [np.nan], [np.nan], np.nan
         if INDX <= turns / 2.0:
             IFR = INDX - 1
         else:
