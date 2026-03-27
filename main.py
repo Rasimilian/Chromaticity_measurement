@@ -729,7 +729,7 @@ class MainWindow(QMainWindow):
         self.canvases[0].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
                                      xy=(self.data_manager.data["turns"], max(y) * 0.7),
                                      xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.7),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[0].ax.set_xlabel('Turn')
         self.canvases[0].ax.set_ylabel('X')
@@ -750,25 +750,25 @@ class MainWindow(QMainWindow):
         self.canvases[1].ax.annotate(f'Qx = {qx:.3f}',
                                      xy=(qx, max(y) * 0.9),
                                      xytext=(qx + 0.05, max(y) * 0.9),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qx_m, color='black', linestyle='--', alpha=0.5)
         self.canvases[1].ax.annotate(f'Qx-s = {qx_m:.3f}',
                                      xy=(qx_m, max(y) * 0.7),
                                      xytext=(qx_m - 0.15, max(y) * 0.7),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qx_p, color='black', linestyle='--', alpha=0.5)
         self.canvases[1].ax.annotate(f'Qx+s = {qx_p:.3f}',
                                      xy=(qx_p, max(y) * 0.5),
                                      xytext=(qx_p + 0.05, max(y) * 0.5),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
         self.canvases[1].ax.annotate(f'Qs = {qs:.3f}',
                                      xy=(qs, max(y) * 0.7),
                                      xytext=(qs + 0.05, max(y) * 0.7),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.grid(True, alpha=0.3)
 
@@ -790,7 +790,7 @@ class MainWindow(QMainWindow):
         self.canvases[3].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
                                      xy=(self.data_manager.data["turns"], max(y) * 0.7),
                                      xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.7),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[3].ax.set_xlabel('Turn')
         self.canvases[3].ax.set_ylabel('Y')
@@ -811,25 +811,25 @@ class MainWindow(QMainWindow):
         self.canvases[4].ax.annotate(f'Qy = {qy:.3f}',
                                      xy=(qy, max(y) * 0.9),
                                      xytext=(qy + 0.05, max(y) * 0.9),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.axvline(qy_m, color='black', linestyle='--', alpha=0.5)
         self.canvases[4].ax.annotate(f'Qy-s = {qy_m:.3f}',
                                      xy=(qy_m, max(y) * 0.7),
                                      xytext=(qy_m - 0.15, max(y) * 0.7),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
-        self.canvases[4].ax.axvline(qx_p, color='black', linestyle='--', alpha=0.5)
+        self.canvases[4].ax.axvline(qy_p, color='black', linestyle='--', alpha=0.5)
         self.canvases[4].ax.annotate(f'Qy+s = {qy_p:.3f}',
                                      xy=(qy_p, max(y) * 0.5),
                                      xytext=(qy_p + 0.05, max(y) * 0.5),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
         self.canvases[4].ax.annotate(f'Qs = {qs:.3f}',
                                      xy=(qs, max(y) * 0.7),
                                      xytext=(qs + 0.05, max(y) * 0.7),
-                                     fontsize=8, color='black', alpha=0.7,
+                                     fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.grid(True, alpha=0.3)
 
