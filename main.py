@@ -769,12 +769,12 @@ class MainWindow(QMainWindow):
         self.canvases[0].ax.axvline(self.data_manager.data["skip_turns"], color='black', linestyle='--', alpha=0.5)
         self.canvases[0].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
                                      xy=(self.data_manager.data["turns"], max(y) * 0.7),
-                                     xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.7),
+                                     xytext=(self.data_manager.data["turns"] + 5, max(y) * 0.7),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[0].ax.annotate(f'Start = {self.data_manager.data["skip_turns"]}',
-                                     xy=(self.data_manager.data["skip_turns"], max(y) * 0.7),
-                                     xytext=(self.data_manager.data["skip_turns"] + 0.05, max(y) * 0.7),
+                                     xy=(self.data_manager.data["skip_turns"], max(y) * -0.3),
+                                     xytext=(self.data_manager.data["skip_turns"] + 5, max(y) * -0.3),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[0].ax.set_xlabel('Turn')
@@ -836,12 +836,12 @@ class MainWindow(QMainWindow):
         self.canvases[3].ax.axvline(self.data_manager.data["skip_turns"], color='black', linestyle='--', alpha=0.5)
         self.canvases[3].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
                                      xy=(self.data_manager.data["turns"], max(y) * 0.7),
-                                     xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.7),
+                                     xytext=(self.data_manager.data["turns"] + 5, max(y) * 0.7),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[3].ax.annotate(f'Start = {self.data_manager.data["skip_turns"]}',
-                                     xy=(self.data_manager.data["skip_turns"], max(y) * 0.7),
-                                     xytext=(self.data_manager.data["skip_turns"] + 0.05, max(y) * 0.7),
+                                     xy=(self.data_manager.data["skip_turns"], max(y) * -0.3),
+                                     xytext=(self.data_manager.data["skip_turns"] + 5, max(y) * -0.3),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[3].ax.set_xlabel('Turn')
