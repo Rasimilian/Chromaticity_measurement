@@ -262,6 +262,8 @@ class DataManager(QObject):
     def update_data_callback(self, pvname=None, value=None, **kw):
         if not self.pvs_updated[pvname]:
             plane = self.pvs_to_plane_map[pvname]
+            if isinstance(value, float):
+                value = [value]
             if not len(value):
                 value = [np.nan]
             self.data[plane] = value - np.nanmean(value)
