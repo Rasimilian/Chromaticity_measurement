@@ -202,7 +202,8 @@ class DataManager(QObject):
         super().__init__()
         self.data = {"x": [np.nan], "cx": np.nan, "qx": np.nan, "qx_m": np.nan, "qx_p": np.nan, "freq_spectrum_qx": [np.nan], "amplitude_spectrum_qx": [np.nan],
                      "y": [np.nan], "cy": np.nan, "qy": np.nan, "qy_m": np.nan, "qy_p": np.nan, "freq_spectrum_qy": [np.nan], "amplitude_spectrum_qy": [np.nan],
-                     "qs": np.nan, "sigma_E_spread": knobs["constants"]["sigma_E_spread"], "energy": knobs["constants"]["energy"], "turns": knobs["constants"]["turns"]}
+                     "qs": np.nan, "sigma_E_spread": knobs["constants"]["sigma_E_spread"], "energy": knobs["constants"]["energy"], "turns": knobs["constants"]["turns"],
+                     "skip_turns": knobs["constants"]["skip_turns"]}
 
         self.max_length = 100
         self.freq_range_qx = [0.3, 0.41]
@@ -224,6 +225,7 @@ class DataManager(QObject):
         self.sextupole_name_to_pvmeas_name_map = {}
         self.initialize_bpm_pv(self.bpm_to_observe)
         self.initialize_sextupole_pv()
+        self.initial_chrom_values = [0, 0]
 
     def initialize_bpm_pv(self, bpm_to_observe):
         if self.bpm_x_pv is not None:
@@ -275,7 +277,7 @@ class DataManager(QObject):
             if not self.pvs_updated[pv]:
                 return
 
-        self.analyze_data(self.data["x"], self.data["y"])
+        self.analyze_data(self.data["x"][self.data["skip_turns"]:], self.data["y"][self.data["skip_turns"]:])
 
         self.data_updated.emit()
 
@@ -429,7 +431,7 @@ class MainWindow(QMainWindow):
         right_panel_layout = QHBoxLayout()
         fields_group = QGroupBox("Parameters")
         fields_group.setFont(QFont("Arial", 10, QFont.Bold))
-        fields_group.setMaximumWidth(300)
+        fields_group.setMaximumWidth(450)
         fields_layout = QFormLayout()
         fields_layout.setSpacing(5)
         fields_layout.setContentsMargins(10, 10, 10, 10)
@@ -440,6 +442,7 @@ class MainWindow(QMainWindow):
         self.field4 = QLineEdit()
         self.field5 = QLineEdit()
         self.field6 = QLineEdit()
+        self.field7 = QLineEdit()
 
         self.field1.setStyleSheet(text_field_style)
         self.field2.setStyleSheet(text_field_style)
@@ -447,13 +450,15 @@ class MainWindow(QMainWindow):
         self.field4.setStyleSheet(text_field_style)
         self.field5.setStyleSheet(text_field_style)
         self.field6.setStyleSheet(text_field_style)
+        self.field7.setStyleSheet(text_field_style)
 
         fields_layout.addRow("SigmaE/E:", self.field1)
         fields_layout.addRow("Energy (Gev):", self.field2)
         fields_layout.addRow("Turns:", self.field3)
-        fields_layout.addRow("Qs (manual):", self.field4)
-        fields_layout.addRow("Qx (manual):", self.field5)
-        fields_layout.addRow("Qy (manual):", self.field6)
+        fields_layout.addRow("Skip turns:", self.field4)
+        fields_layout.addRow("Qs (manual):", self.field5)
+        fields_layout.addRow("Qx (manual):", self.field6)
+        fields_layout.addRow("Qy (manual):", self.field7)
 
         self.field1.setReadOnly(False)
         self.field1.setText(str(self.data_manager.data["sigma_E_spread"]))
@@ -462,8 +467,10 @@ class MainWindow(QMainWindow):
         self.field3.setReadOnly(False)
         self.field3.setText(str(int(self.data_manager.data["turns"])))
         self.field4.setReadOnly(False)
+        self.field4.setText(str(int(self.data_manager.data["skip_turns"])))
         self.field5.setReadOnly(False)
         self.field6.setReadOnly(False)
+        self.field7.setReadOnly(False)
 
         self.field1.returnPressed.connect(self.update_fields)
         self.field2.returnPressed.connect(self.update_fields)
@@ -471,6 +478,7 @@ class MainWindow(QMainWindow):
         self.field4.returnPressed.connect(self.update_fields)
         self.field5.returnPressed.connect(self.update_fields)
         self.field6.returnPressed.connect(self.update_fields)
+        self.field7.returnPressed.connect(self.update_fields)
 
         fields_group.setLayout(fields_layout)
 
@@ -514,7 +522,7 @@ class MainWindow(QMainWindow):
         self.spinbox1_value = QLineEdit("0.0")
         self.spinbox1_value.setFixedWidth(60)
         self.spinbox1_value.setAlignment(Qt.AlignCenter)
-        self.spinbox1_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(1, float(self.spinbox1_value.text())))
+        self.spinbox1_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(1))
 
         self.spinbox1_plus = QPushButton("+")
         self.spinbox1_plus.setFixedSize(30, 25)
@@ -540,7 +548,7 @@ class MainWindow(QMainWindow):
         self.spinbox2_value = QLineEdit("0.0")
         self.spinbox2_value.setFixedWidth(60)
         self.spinbox2_value.setAlignment(Qt.AlignCenter)
-        self.spinbox2_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(2, float(self.spinbox2_value.text())))
+        self.spinbox2_value.returnPressed.connect(lambda: self.change_spinbox_textfield_value(2))
 
         self.spinbox2_plus = QPushButton("+")
         self.spinbox2_plus.setFixedSize(30, 25)
@@ -556,6 +564,25 @@ class MainWindow(QMainWindow):
         spinbox_buttons_layout.addWidget(spinbox_group2)
 
         control_buttons_layout.addLayout(spinbox_buttons_layout)
+
+        self.read_btn = QPushButton("Read")
+        self.read_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                border: none;
+                color: white;
+                padding: 8px;
+                font-size: 12px;
+                font-weight: bold;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #0b7dda;
+            }
+        """)
+        self.read_btn.clicked.connect(self.on_read_button_clicked)
+        control_buttons_layout.addWidget(self.read_btn)
+
         control_buttons_group.setLayout(control_buttons_layout)
 
         sextupoles_fields_group = QGroupBox("Sextupoles")
@@ -675,6 +702,15 @@ class MainWindow(QMainWindow):
         pvs = list(self.data_manager.initial_sextupole_set_values.keys())
         values = list(self.data_manager.initial_sextupole_set_values.values())
         epics.caput_many(pvs, values)
+        self.data_manager.initial_chrom_values = [0, 0]
+        self.spinbox1_value.setText(f"{0:.2f}")
+        self.spinbox2_value.setText(f"{0:.2f}")
+
+    def on_read_button_clicked(self):
+        self.data_manager.initial_sextupole_set_values = deepcopy(self.data_manager.sextupole_set_values)
+        self.data_manager.initial_chrom_values = [0, 0]
+        self.spinbox1_value.setText(f"{0:.2f}")
+        self.spinbox2_value.setText(f"{0:.2f}")
 
     def fill_sextupoles_field(self, pvname):
         if pvname in self.sextupole_set_fields:
@@ -696,28 +732,32 @@ class MainWindow(QMainWindow):
             new_value = current_value + delta
             self.spinbox2_value.setText(f"{new_value:.2f}")
 
-    def change_spinbox_textfield_value(self, spinbox_id, previous_value):
+    def change_spinbox_textfield_value(self, spinbox_id):
         if spinbox_id == 1:
+            previous_value = self.data_manager.initial_chrom_values[0]
             current_value = float(self.spinbox1_value.text())
             delta = current_value - previous_value
             self.calculte_and_set_sextupole_dI([delta, 0])
+            self.data_manager.initial_chrom_values[0] = current_value
         elif spinbox_id == 2:
+            previous_value = self.data_manager.initial_chrom_values[1]
             current_value = float(self.spinbox2_value.text())
             delta = current_value - previous_value
             self.calculte_and_set_sextupole_dI([0, delta])
+            self.data_manager.initial_chrom_values[1] = current_value
 
     def calculte_and_set_sextupole_dI(self, delta_cxy):
         coeff = self.data_manager.data["energy"] / 0.2
         dI_sext = self.data_manager.cxy_inv.dot(delta_cxy) * coeff
         pvs = list(self.data_manager.sextupole_set_values.keys())
         vals = np.array(list(self.data_manager.sextupole_set_values.values()))
-        print(vals)
         epics.caput_many(pvs, vals + dI_sext)
 
     def update_fields(self):
         self.data_manager.data["sigma_E_spread"] = abs(float(self.field1.text()))
         self.data_manager.data["energy"] = abs(float(self.field2.text()))
         self.data_manager.data["turns"] = abs(int(float(self.field3.text())))
+        self.data_manager.data["skip_turns"] = abs(int(float(self.field4.text())))
 
     def update_plots(self):
         self.canvases[0].ax.clear()
@@ -726,9 +766,15 @@ class MainWindow(QMainWindow):
         self.canvases[0].ax.plot(x, y, 'b-', linewidth=2)
         self.canvases[0].ax.set_title(self.data_manager.bpm_to_observe)
         self.canvases[0].ax.axvline(self.data_manager.data["turns"], color='black', linestyle='--', alpha=0.5)
+        self.canvases[0].ax.axvline(self.data_manager.data["skip_turns"], color='black', linestyle='--', alpha=0.5)
         self.canvases[0].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
                                      xy=(self.data_manager.data["turns"], max(y) * 0.7),
                                      xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.7),
+                                     fontsize=10, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
+        self.canvases[0].ax.annotate(f'Start = {self.data_manager.data["skip_turns"]}',
+                                     xy=(self.data_manager.data["skip_turns"], max(y) * 0.7),
+                                     xytext=(self.data_manager.data["skip_turns"] + 0.05, max(y) * 0.7),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[0].ax.set_xlabel('Turn')
@@ -766,8 +812,8 @@ class MainWindow(QMainWindow):
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
         self.canvases[1].ax.annotate(f'Qs = {qs:.3f}',
-                                     xy=(qs, max(y) * 0.7),
-                                     xytext=(qs + 0.05, max(y) * 0.7),
+                                     xy=(qs, max(y) * 0.3),
+                                     xytext=(qs + 0.05, max(y) * 0.3),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[1].ax.grid(True, alpha=0.3)
@@ -787,9 +833,15 @@ class MainWindow(QMainWindow):
         self.canvases[3].ax.plot(x, y, 'r-', linewidth=2)
         self.canvases[3].ax.set_title(self.data_manager.bpm_to_observe)
         self.canvases[3].ax.axvline(self.data_manager.data["turns"], color='black', linestyle='--', alpha=0.5)
+        self.canvases[3].ax.axvline(self.data_manager.data["skip_turns"], color='black', linestyle='--', alpha=0.5)
         self.canvases[3].ax.annotate(f'Turns = {self.data_manager.data["turns"]}',
                                      xy=(self.data_manager.data["turns"], max(y) * 0.7),
                                      xytext=(self.data_manager.data["turns"] + 0.05, max(y) * 0.7),
+                                     fontsize=10, color='black', alpha=0.7,
+                                     arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
+        self.canvases[3].ax.annotate(f'Start = {self.data_manager.data["skip_turns"]}',
+                                     xy=(self.data_manager.data["skip_turns"], max(y) * 0.7),
+                                     xytext=(self.data_manager.data["skip_turns"] + 0.05, max(y) * 0.7),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[3].ax.set_xlabel('Turn')
@@ -827,8 +879,8 @@ class MainWindow(QMainWindow):
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.axvline(qs, color='black', linestyle='--', alpha=0.5)
         self.canvases[4].ax.annotate(f'Qs = {qs:.3f}',
-                                     xy=(qs, max(y) * 0.7),
-                                     xytext=(qs + 0.05, max(y) * 0.7),
+                                     xy=(qs, max(y) * 0.3),
+                                     xytext=(qs + 0.05, max(y) * 0.3),
                                      fontsize=10, color='black', alpha=0.7,
                                      arrowprops=dict(arrowstyle='->', color='black', alpha=0.5))
         self.canvases[4].ax.grid(True, alpha=0.3)
