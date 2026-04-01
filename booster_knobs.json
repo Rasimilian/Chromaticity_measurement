@@ -303,7 +303,7 @@
     "ba1.sf1": {
       "set_curr": "MG-BA1:SF1-Iadd:Set",
       "meas_curr": "MG-BA1:SF1-Ipoi:Mea",
-      "put_curr": "MG-BA1:SF1-Iadd:Set",
+      "set_waveform": "MG-BA1:SF1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -318,7 +318,7 @@
     "ba1.sf2": {
       "set_curr": "MG-BA1:SF2-Iadd:Set",
       "meas_curr": "MG-BA1:SF2-Ipoi:Mea",
-      "put_curr": "MG-BA1:SF2-Iadd:Set",
+      "set_waveform": "MG-BA1:SF2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -333,7 +333,7 @@
     "ba2.sf1": {
       "set_curr": "MG-BA2:SF1-Iadd:Set",
       "meas_curr": "MG-BA2:SF1-Ipoi:Mea",
-      "put_curr": "MG-BA2:SF1-Iadd:Set",
+      "set_waveform": "MG-BA2:SF1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -348,7 +348,7 @@
     "ba2.sf2": {
       "set_curr": "MG-BA2:SF2-Iadd:Set",
       "meas_curr": "MG-BA2:SF2-Ipoi:Mea",
-      "put_curr": "MG-BA2:SF2-Iadd:Set",
+      "set_waveform": "MG-BA2:SF2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -363,7 +363,7 @@
     "ba3.sf1": {
       "set_curr": "MG-BA3:SF1-Iadd:Set",
       "meas_curr": "MG-BA3:SF1-Ipoi:Mea",
-      "put_curr": "MG-BA3:SF1-Iadd:Set",
+      "set_waveform": "MG-BA3:SF1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -378,7 +378,7 @@
     "ba3.sf2": {
       "set_curr": "MG-BA3:SF2-Iadd:Set",
       "meas_curr": "MG-BA3:SF2-Ipoi:Mea",
-      "put_curr": "MG-BA3:SF2-Iadd:Set",
+      "set_waveform": "MG-BA3:SF2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -393,7 +393,7 @@
     "ba4.sf1": {
       "set_curr": "MG-BA4:SF1-Iadd:Set",
       "meas_curr": "MG-BA4:SF1-Ipoi:Mea",
-      "put_curr": "MG-BA4:SF1-Iadd:Set",
+      "set_waveform": "MG-BA4:SF1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -408,7 +408,7 @@
     "ba4.sf2": {
       "set_curr": "MG-BA4:SF2-Iadd:Set",
       "meas_curr": "MG-BA4:SF2-Ipoi:Mea",
-      "put_curr": "MG-BA4:SF2-Iadd:Set",
+      "set_waveform": "MG-BA4:SF2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -423,7 +423,7 @@
     "ba1.sd1": {
       "set_curr": "MG-BA1:SD1-Iadd:Set",
       "meas_curr": "MG-BA1:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA1:SD1-Iadd:Set",
+      "set_waveform": "MG-BA1:SD1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -438,7 +438,7 @@
     "ba1.sd2": {
       "set_curr": "MG-BA1:SD2-Iadd:Set",
       "meas_curr": "MG-BA1:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA1:SD2-Iadd:Set",
+      "set_waveform": "MG-BA1:SD2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -453,7 +453,7 @@
     "ba2.sd1": {
       "set_curr": "MG-BA2:SD1-Iadd:Set",
       "meas_curr": "MG-BA2:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA2:SD1-Iadd:Set",
+      "set_waveform": "MG-BA2:SD1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -468,7 +468,7 @@
     "ba2.sd2": {
       "set_curr": "MG-BA2:SD2-Iadd:Set",
       "meas_curr": "MG-BA2:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA2:SD2-Iadd:Set",
+      "set_waveform": "MG-BA2:SD2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -483,7 +483,7 @@
     "ba3.sd1": {
       "set_curr": "MG-BA3:SD1-Iadd:Set",
       "meas_curr": "MG-BA3:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA3:SD1-Iadd:Set",
+      "set_waveform": "MG-BA3:SD1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -498,7 +498,7 @@
     "ba3.sd2": {
       "set_curr": "MG-BA3:SD2-Iadd:Set",
       "meas_curr": "MG-BA3:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA3:SD2-Iadd:Set",
+      "set_waveform": "MG-BA3:SD2-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -513,7 +513,7 @@
     "ba4.sd1": {
       "set_curr": "MG-BA4:SD1-Iadd:Set",
       "meas_curr": "MG-BA4:SD1-Ipoi:Mea",
-      "put_curr": "MG-BA4:SD1-Iadd:Set",
+      "set_waveform": "MG-BA4:SD1-Iwf:Set",
       "coeffs": [
         9.495984
       ],
@@ -528,7 +528,7 @@
     "ba4.sd2": {
       "set_curr": "MG-BA4:SD2-Iadd:Set",
       "meas_curr": "MG-BA4:SD2-Ipoi:Mea",
-      "put_curr": "MG-BA4:SD2-Iadd:Set",
+      "set_waveform": "MG-BA4:SD2-Iwf:Set",
       "coeffs": [
         9.495984
       ],

@@ -29,8 +29,18 @@ def get_spectrum(signal, nturns, freq_range):
     nturns = min(nturns, len(signal))
     main_freq, main_freq_amplitude, freq_spectrum, amplitude_spectrum = np.nan, np.nan, np.array([np.nan]), np.array([np.nan])
     try:
-        freq, freq_spectrum, amplitude_spectrum, main_freq_amplitude = naff(signal, nturns, nterms=1, skipTurns=0, window=1, freq_range=freq_range)
+        freq, freq_spectrum, amplitude_spectrum, main_freq_amplitude = naff(signal, nturns, nterms=1, skipTurns=0, window=2, freq_range=freq_range)
         main_freq = freq[0][1] if freq[0][1] <= 0.5 else (1 - freq[0][1])
     except ValueError:
         print(f"Data size is less than turns {nturns}")
     return main_freq, main_freq_amplitude, freq_spectrum, amplitude_spectrum
+
+
+def zero_pad_to_3x_power2(signal, multiplicator=3):
+    N = len(signal)
+    target_size = multiplicator * N
+    padded_size = 1 << (target_size - 1).bit_length()
+    padded_signal = np.zeros(padded_size, dtype=signal.dtype)
+    padded_signal[:N] = signal
+
+    return padded_signal
