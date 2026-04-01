@@ -7,7 +7,8 @@
     "sigma_E_spread": 0.004,
     "bpm_to_observe": "BA1.PK2",
     "turns": 512,
-    "skip_turns": 10
+    "skip_turns": 10,
+    "max_sextupole_current": 5.5
   },
   "bpm": {
     "BIS.PK2": {

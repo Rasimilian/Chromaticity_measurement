@@ -734,6 +734,7 @@ class MainWindow(QMainWindow):
         self.spinbox2_value.setText(f"{0:.2f}")
 
         for pv, values in self.data_manager.initial_sextupole_set_waveform_values.items():
+            values = np.clip(values, -knobs["constants"]["max_sextupole_current"], knobs["constants"]["max_sextupole_current"])
             epics.caput(pv, values)
 
     def on_make_ramp_button_clicked(self):
@@ -742,6 +743,7 @@ class MainWindow(QMainWindow):
             pv_set_waveform_name = sext_config["set_waveform"]
             pv_set_name = sext_config["set_curr"]
             waveform_values = self.data_manager.sextupole_set_values[pv_set_name] * base_ramp
+            waveform_values = np.clip(waveform_values, -knobs["constants"]["max_sextupole_current"], knobs["constants"]["max_sextupole_current"])
             epics.caput(pv_set_waveform_name, waveform_values)
             epics.caput(pv_set_name, 0)
 
