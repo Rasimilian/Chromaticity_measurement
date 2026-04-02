@@ -306,6 +306,7 @@
       "set_curr": "MG-BA1:SF1-Iadd:Set",
       "meas_curr": "MG-BA1:SF1-Ipoi:Mea",
       "set_waveform": "MG-BA1:SF1-Iwf:Set",
+      "set_ramp_status": "MG-BA1:SF1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -321,6 +322,7 @@
       "set_curr": "MG-BA1:SF2-Iadd:Set",
       "meas_curr": "MG-BA1:SF2-Ipoi:Mea",
       "set_waveform": "MG-BA1:SF2-Iwf:Set",
+      "set_ramp_status": "MG-BA1:SF2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -336,6 +338,7 @@
       "set_curr": "MG-BA2:SF1-Iadd:Set",
       "meas_curr": "MG-BA2:SF1-Ipoi:Mea",
       "set_waveform": "MG-BA2:SF1-Iwf:Set",
+      "set_ramp_status": "MG-BA2:SF1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -351,6 +354,7 @@
       "set_curr": "MG-BA2:SF2-Iadd:Set",
       "meas_curr": "MG-BA2:SF2-Ipoi:Mea",
       "set_waveform": "MG-BA2:SF2-Iwf:Set",
+      "set_ramp_status": "MG-BA2:SF2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -366,6 +370,7 @@
       "set_curr": "MG-BA3:SF1-Iadd:Set",
       "meas_curr": "MG-BA3:SF1-Ipoi:Mea",
       "set_waveform": "MG-BA3:SF1-Iwf:Set",
+      "set_ramp_status": "MG-BA3:SF1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -381,6 +386,7 @@
       "set_curr": "MG-BA3:SF2-Iadd:Set",
       "meas_curr": "MG-BA3:SF2-Ipoi:Mea",
       "set_waveform": "MG-BA3:SF2-Iwf:Set",
+      "set_ramp_status": "MG-BA3:SF2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -396,6 +402,7 @@
       "set_curr": "MG-BA4:SF1-Iadd:Set",
       "meas_curr": "MG-BA4:SF1-Ipoi:Mea",
       "set_waveform": "MG-BA4:SF1-Iwf:Set",
+      "set_ramp_status": "MG-BA4:SF1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -411,6 +418,7 @@
       "set_curr": "MG-BA4:SF2-Iadd:Set",
       "meas_curr": "MG-BA4:SF2-Ipoi:Mea",
       "set_waveform": "MG-BA4:SF2-Iwf:Set",
+      "set_ramp_status": "MG-BA4:SF2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -426,6 +434,7 @@
       "set_curr": "MG-BA1:SD1-Iadd:Set",
       "meas_curr": "MG-BA1:SD1-Ipoi:Mea",
       "set_waveform": "MG-BA1:SD1-Iwf:Set",
+      "set_ramp_status": "MG-BA1:SD1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -441,6 +450,7 @@
       "set_curr": "MG-BA1:SD2-Iadd:Set",
       "meas_curr": "MG-BA1:SD2-Ipoi:Mea",
       "set_waveform": "MG-BA1:SD2-Iwf:Set",
+      "set_ramp_status": "MG-BA1:SD2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -456,6 +466,7 @@
       "set_curr": "MG-BA2:SD1-Iadd:Set",
       "meas_curr": "MG-BA2:SD1-Ipoi:Mea",
       "set_waveform": "MG-BA2:SD1-Iwf:Set",
+      "set_ramp_status": "MG-BA2:SD1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -471,6 +482,7 @@
       "set_curr": "MG-BA2:SD2-Iadd:Set",
       "meas_curr": "MG-BA2:SD2-Ipoi:Mea",
       "set_waveform": "MG-BA2:SD2-Iwf:Set",
+      "set_ramp_status": "MG-BA2:SD2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -486,6 +498,7 @@
       "set_curr": "MG-BA3:SD1-Iadd:Set",
       "meas_curr": "MG-BA3:SD1-Ipoi:Mea",
       "set_waveform": "MG-BA3:SD1-Iwf:Set",
+      "set_ramp_status": "MG-BA3:SD1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -501,6 +514,7 @@
       "set_curr": "MG-BA3:SD2-Iadd:Set",
       "meas_curr": "MG-BA3:SD2-Ipoi:Mea",
       "set_waveform": "MG-BA3:SD2-Iwf:Set",
+      "set_ramp_status": "MG-BA3:SD2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -516,6 +530,7 @@
       "set_curr": "MG-BA4:SD1-Iadd:Set",
       "meas_curr": "MG-BA4:SD1-Ipoi:Mea",
       "set_waveform": "MG-BA4:SD1-Iwf:Set",
+      "set_ramp_status": "MG-BA4:SD1-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],
@@ -531,6 +546,7 @@
       "set_curr": "MG-BA4:SD2-Iadd:Set",
       "meas_curr": "MG-BA4:SD2-Ipoi:Mea",
       "set_waveform": "MG-BA4:SD2-Iwf:Set",
+      "set_ramp_status": "MG-BA4:SD2-StartCycle:Cmd",
       "coeffs": [
         9.495984
       ],

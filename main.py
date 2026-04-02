@@ -21,7 +21,7 @@ from datetime import datetime
 import json
 from utils.range_selector import RangeSelectorGraph
 from utils.chrom_to_sext_response import CXY_TO_SEXT_CUR
-from utils.generate_ramp import generate_base_ramp
+from utils.generate_ramp import generate_base_ramp, INJECTION_BORDER
 from utils.array_processing import check_waveform_size
 
 
@@ -220,6 +220,7 @@ class DataManager(QObject):
         self.bpm_x_pv = self.bpm_y_pv = None
         self.initial_sextupole_set_values = {}
         self.initial_sextupole_set_waveform_values = {}
+        self.initial_sextupole_set_waveform_status_values = {}
         self.sextupole_set_values = {}
         self.sextupole_set_pvs = {}
         self.sextupole_name_to_pvset_name_map = {}
@@ -269,6 +270,10 @@ class DataManager(QObject):
             val = epics.caget(pv_set_waveform_name)
             val = check_waveform_size(val, knobs["constants"]["waveform_length"])
             self.initial_sextupole_set_waveform_values[pv_set_waveform_name] = val
+
+            pv_set_waveform_status_name = sext_config["set_ramp_status"]
+            val = epics.caget(pv_set_waveform_status_name)
+            self.initial_sextupole_set_waveform_status_values[pv_set_waveform_status_name] = val
 
     def update_data_callback(self, pvname=None, value=None, **kw):
         if not self.pvs_updated[pvname]:
@@ -735,18 +740,25 @@ class MainWindow(QMainWindow):
         self.spinbox1_value.setText(f"{0:.2f}")
         self.spinbox2_value.setText(f"{0:.2f}")
 
+        for pv, values in self.data_manager.initial_sextupole_set_waveform_status_values.items():
+            epics.caput(pv, values, wait=True)
+
         for pv, values in self.data_manager.initial_sextupole_set_waveform_values.items():
             values = np.clip(values, -knobs["constants"]["max_sextupole_current"], knobs["constants"]["max_sextupole_current"])
             epics.caput(pv, values)
 
     def on_make_ramp_button_clicked(self):
-        base_ramp = generate_base_ramp(0.2, 3, knobs["constants"]["waveform_length"])
+        base_ramp = generate_base_ramp(0.2, 3, length=knobs["constants"]["waveform_length"])
         for sext_name, sext_config in knobs["sextupole"].items():
             pv_set_waveform_name = sext_config["set_waveform"]
             pv_set_name = sext_config["set_curr"]
-            init_waveform_values = self.data_manager.initial_sextupole_set_waveform_values[pv_set_waveform_name]
+            pv_set_waveform_status = sext_config["set_ramp_status"]
+            init_waveform_values = epics.caget(pv_set_waveform_name)
+            inj_current = np.mean(init_waveform_values[:INJECTION_BORDER])
+            init_waveform_values = inj_current * base_ramp
             waveform_values = self.data_manager.sextupole_set_values[pv_set_name] * base_ramp + init_waveform_values
             waveform_values = np.clip(waveform_values, -knobs["constants"]["max_sextupole_current"], knobs["constants"]["max_sextupole_current"])
+            epics.caput(pv_set_waveform_status, 1, wait=True)
             epics.caput(pv_set_waveform_name, waveform_values)
             epics.caput(pv_set_name, 0)
 
@@ -758,6 +770,8 @@ class MainWindow(QMainWindow):
 
         for sext_name, sext_config in knobs["sextupole"].items():
             pv_set_name = sext_config["set_waveform"]
+            self.data_manager.initial_sextupole_set_waveform_values[pv_set_name] = epics.caget(pv_set_name)
+            pv_set_waveform_status = name = sext_config["set_ramp_status"]
             self.data_manager.initial_sextupole_set_waveform_values[pv_set_name] = epics.caget(pv_set_name)
 
     def fill_sextupoles_field(self, pvname):

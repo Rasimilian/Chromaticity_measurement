@@ -1,5 +1,7 @@
 import numpy as np
 
+INJECTION_BORDER = 100  # 500
+
 
 def generate_base_ramp(e_inj, e_ext, e_null=0, length=9838):
     """
